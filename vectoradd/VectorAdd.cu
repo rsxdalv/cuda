@@ -1,10 +1,8 @@
 #include <stdio.h>
 
-#define THREADS_PER_BLOCK   1024
-
-__global__
-void cuAdd(int *a,int *b,int *c, int N)
+__global__ void cuAdd(int *a,int *b,int *c, int N)
 {
+	// global index
     int offset = blockDim.x * blockIdx.x + threadIdx.x;
     if(offset < N)
     {
@@ -16,8 +14,11 @@ void cuAdd(int *a,int *b,int *c, int N)
 
 int main()
 {
-    int *a, *b, *c,
-        *_a, *_b, *_c;
+	// host 
+    int *a, *b, *c;
+
+	// device
+	int *_a, *_b, *_c;
 
     const int length = N * sizeof( int );
 
@@ -31,15 +32,17 @@ int main()
 
     for(int i=0; i < N; i++)
     {
-        a[i]=b[i]=i;
-        c[i]=-1;
+        a[i]=1;
+		b[i]=2;
     }
 
     cudaMemcpy(_a, a, length, cudaMemcpyHostToDevice);
     cudaMemcpy(_b, b, length, cudaMemcpyHostToDevice);
 
     //int blocks = length/THREADS_PER_BLOCK;
-    cuAdd<<<128, THREADS_PER_BLOCK>>>(_a,_b,_c, length);
+	size_t blockSize = 1024; 
+	size_t gridSize  = (N + blockSize - 1)/blockSize;
+    cuAdd<<< gridSize, blockSize>>>(_a, _b, _c, length);
 
     cudaMemcpy(c, _c, length, cudaMemcpyDeviceToHost);
 
