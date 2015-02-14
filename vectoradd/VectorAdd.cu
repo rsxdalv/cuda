@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#define N (1<<10)
+#define BLOCKS_PER_GRID 128
 #define THREADS_PER_BLOCK   1024
 
 __global__
@@ -12,8 +14,6 @@ void cuAdd(int *a,int *b,int *c, int N)
     }
 }
 
-#define N (1<<20)
-
 int main()
 {
     int *a, *b, *c,
@@ -24,14 +24,14 @@ int main()
     cudaMalloc( (void **) &_a, length );
     cudaMalloc( (void **) &_b, length );
     cudaMalloc( (void **) &_c, length );
-
+    
     a = (int *) malloc(length);
     b = (int *) malloc(length);
     c = (int *) malloc(length);
 
     for(int i=0; i < N; i++)
     {
-        a[i]=b[i]=i;
+        a[i]=b[i]=N-i;
         c[i]=-1;
     }
 
@@ -39,7 +39,7 @@ int main()
     cudaMemcpy(_b, b, length, cudaMemcpyHostToDevice);
 
     //int blocks = length/THREADS_PER_BLOCK;
-    cuAdd<<<128, THREADS_PER_BLOCK>>>(_a,_b,_c, length);
+    cuAdd<<<BLOCKS_PER_GRID, THREADS_PER_BLOCK>>>(_a,_b,_c, length);
 
     cudaMemcpy(c, _c, length, cudaMemcpyDeviceToHost);
 
