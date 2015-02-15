@@ -10,6 +10,8 @@ __global__ void cuAdd(int *a,int *b,int *c, int N)
     }
 }
 
+#define N (1<<20)
+
 int main()
 {
     const int length = N * sizeof( int );
