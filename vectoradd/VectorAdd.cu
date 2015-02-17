@@ -1,5 +1,10 @@
 #include <stdio.h>
 
+/**
+ * KERNEL cuAdd() - Takes 2 input arrays of same size N and adds them into C.
+ * Locations are found by computing the global index of each thread.
+ * @return 
+ */
 __global__ void cuAdd(int *a,int *b,int *c, int N)
 {
 	// global index
@@ -12,6 +17,13 @@ __global__ void cuAdd(int *a,int *b,int *c, int N)
 
 #define N (1<<20)
 
+/**
+ * ENTRY main() - Tests <<<>>>cuAdd() function: Initializes memory and data on
+ * the host, then memory on the device. Copies the data from host to device,
+ * executes kernel with memory device pointers, copies result back to host,
+ * displays results for error checking and frees allocated memory.
+ * @return 
+ */
 int main()
 {
     const int length = N * sizeof( int );
