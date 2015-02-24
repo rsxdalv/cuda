@@ -34,7 +34,7 @@ __global__ void cuMult(int *a, int *b, int *c, int p, int n, int m)
     if(i < p)
     {
         int sum = 0;
-        for(int k=0;k<m;z++)
+        for(int k=0;k<m;k++)
         {
             sum += a[i][k]*b[k][j];
         }
