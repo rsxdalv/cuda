@@ -11,6 +11,10 @@ set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O2
 -gencode arch=compute_50,code=sm_50 
 )
 
+# avoiding nvcc -rdynamic flag
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+
 # indicate include dir
 include_directories(
 /usr/local/cuda/include

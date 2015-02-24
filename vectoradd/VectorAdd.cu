@@ -26,6 +26,10 @@ __global__ void cuAdd(int *a,int *b,int *c, int N)
  */
 int main()
 {
+    const int depth_a = N * sizeof( int ),
+            length_b = N * sizeof( int ),
+            cosize_ab = N * sizeof( int );
+    
     const int length = N * sizeof( int );
 
 	// host 
