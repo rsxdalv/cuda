@@ -35,6 +35,6 @@ MatrixMult.cu
 	 
 # Indicate target & libraries to link
 target_link_libraries(
-VectorAdd
+MatrixMult
 -lcudart
 ) 

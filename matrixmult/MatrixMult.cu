@@ -24,21 +24,23 @@ __global__ void cuAdd(int *a,int *b,int *c, int N)
  * @param n - length of matrix B and C
  * @param m - length of A and depth of B
  */
-__global__ void cuMult(int *a, int *b, int *c, int p, int n, int m)
+
+    
+    
+    
+__global__ void cuMult(int *a, int *b, int *c, int wA, int wB)
 {
-	// global index
-    int offset = blockDim.x * blockIdx.x + threadIdx.x;
-        // i and j depth
-    int i = offset / n;
-    int j = offset % n;
-    if(i < p)
+    // global index
+    int gidx = blockDim.x * blockIdx.x + threadIdx.x;  // col
+    int gidy = blockDim.y * blockIdx.y + threadIdx.y;   // row
+    
+    int sum = 0;
+    for(int k=0;k<wA;k++)
     {
-        int sum = 0;
-        for(int k=0;k<m;k++)
-        {
-            sum += a[i][k]*b[k][j];
-        }
-    } 
+        sum += a[gidy*wA + k] * b[k*wB +gidx];
+    }
+    // c [gidy][gidx]
+    c[gidy * wB + gidx] = sum;
 }
 
 #define N (1<<5)
@@ -52,44 +54,62 @@ __global__ void cuMult(int *a, int *b, int *c, int p, int n, int m)
  */
 int main()
 {
-    const int depth_a = N,
-            length_b = N,
-            cosize_ab = N,
-            size_a = depth_a * cosize_ab * sizeof( int ),
-            size_b = cosize_ab * length_b * sizeof( int ),
-            size_c = depth_a * length_b * sizeof( int );
     
-    const int length = N * sizeof( int );
+    // width A
+    int wA = 320;
+    // height A
+    int hA = 640;
+    
+    // width B
+    int wB = 320;
+    // height B
+    int hB = 320;
+    
+    int wC = wB;
+    int hC = hA;
 
-	// host 
+    size_t size_a = sizeof(int) * wA * hA;
+    size_t size_b = sizeof(int) * wB * hB;
+    size_t size_b = sizeof(int) * wA * hA;
+	
+    // host 
     int *a, *b, *c;
     a = (int *) malloc(size_a);
     b = (int *) malloc(size_b);
     c = (int *) malloc(size_c);
 
-	// device
-	int *_a, *_b, *_c;
+    // device
+    int *_a, *_b, *_c;
     cudaMalloc( (void **) &_a, size_a );
     cudaMalloc( (void **) &_b, size_b );
     cudaMalloc( (void **) &_c, size_c );
 
-	// initialize data on the cpu
-    for(int i=0; i < N; i++)
+    // initializ A
+    for(int i=0; i < hA * wA; i++)
     {
-        a[i]=1;
-		b[i]=2;
+        a[i] = ;
     }
+    
+    // initializ B
+    for(int i=0; i < hB * wB; i++)
+    {
+        b[i] = ;
+    }
+    
 
 	// copy data to gpu
     cudaMemcpy(_a, a, size_a, cudaMemcpyHostToDevice);
     cudaMemcpy(_b, b, size_b, cudaMemcpyHostToDevice);
 
-	size_t blockSize = 1024; 
-	size_t gridSize  = (N + blockSize - 1)/blockSize;
+    // x : col , y: row
+    dim3 blockSize(16,16); 
+    dim3 gridSize((wC+15)/16, (hC+15)/16);
+
+                //(N + blockSize - 1)/blockSize;
 
 	// kernel execution
-    cuAdd<<< gridSize, blockSize>>>(_a, _b, _c, length);
-    cuMult<<< gridSize, blockSize>>>(_a, _b, _c, depth_a, length_b, cosize_ab);
+    //cuAdd<<< gridSize, blockSize>>>(_a, _b, _c, length);
+    cuMult<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB);
 
 	// copy data back to cpu
     cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
