@@ -55,8 +55,6 @@
         </makeTool>
       </makefileType>
       <item path="MatrixMult.cu" ex="false" tool="1" flavor2="2">
-        <ccTool flags="0">
-        </ccTool>
       </item>
     </conf>
   </confs>
