@@ -56,15 +56,16 @@ __global__ void cuMultOpti(int *a, int *b, int *c, int wA, int wB, int hA)
     int gidy = blockDim.y * blockIdx.y + threadIdx.y;   // row
     
     /* Check if gidx is in within limits */
-    if(gidx < hA, gidy < wB)
-    
-    int sum = 0;
-    for(int k=0;k<wA;k++)
+    if(gidx < wB && gidy < hA)
     {
-        sum += a[gidy*wA + k] * b[k*wB + gidx];
+        int sum = 0;
+        for(int k=0;k<wA;k++)
+        {
+            sum += a[gidy*wA + k] * b[k*wB + gidx];
+        }
+        // c [gidy][gidx]
+        c[gidy * wB + gidx] = sum;
     }
-    // c [gidy][gidx]
-    c[gidy * wB + gidx] = sum;
 }
 
 /**
@@ -94,6 +95,7 @@ int main()
     size_t size_b = sizeof(int) * wB * hB;
     size_t size_c = sizeof(int) * wC * hC;
 	
+    
     // host 
     int *a, *b, *c;
     a = (int *) malloc(size_a);
@@ -118,7 +120,7 @@ int main()
         b[i] = 2;
     }
     
-
+    
     // copy data to GPU
     cudaMemcpy(_a, a, size_a, cudaMemcpyHostToDevice);
     cudaMemcpy(_b, b, size_b, cudaMemcpyHostToDevice);
@@ -128,15 +130,20 @@ int main()
     // (N.x + blockSize.x - 1)/blockSize.x, (N.y + blockSize.y -1)/blockSize.y)
     dim3 gridSize((wC+15)/16, (hC+15)/16);
         
-
     // kernel execution
-    cuMultOpti<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB);
+    cuMultOpti<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
 
     // copy data back to CPU
     cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
 
+    
     // Check first and last memory location
-    printf("Start: %d. Finish: %d.\n",c[0], c[wC * hC - 1]);
+    printf("Start: %d. Finish: %d.\n",c[2], c[wC * hC - 1]);
+    
+    int k = 0;
+    while(c[k] == c[k+1])
+        k++;
+    printf("Breakpoint k = %d",k);
 
     // release resources
     cudaFree(_a);

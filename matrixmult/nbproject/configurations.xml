@@ -39,6 +39,7 @@
             <incDir>
               <pElem>../../../.cache/netbeans/8.0.2/remote-files/129.10.53.105_22_workshop/usr/local/cuda/include</pElem>
               <pElem>../../../.cache/netbeans/8.0.2/remote-files/129.10.53.105_22_workshop/usr/local/cuda/samples/common/inc</pElem>
+              <pElem>../../../.cache/netbeans/8.0.2/remote-files/129.10.53.105_22_workshop/usr/local/cuda/targets/x86_64-linux/include</pElem>
               <pElem>CMakeFiles/MatrixMult.dir</pElem>
             </incDir>
             <incFile>
@@ -54,7 +55,9 @@
           </ccTool>
         </makeTool>
       </makefileType>
-      <item path="MatrixMult.cu" ex="false" tool="1" flavor2="2">
+      <item path="MatrixMult.cu" ex="false" tool="1" flavor2="0">
+        <ccTool flags="0">
+        </ccTool>
       </item>
     </conf>
   </confs>
