@@ -50,12 +50,23 @@ __global__ void cuMult(int *a, int *b, int *c, int wA, int wB)
  */
 __global__ void cuMultOpti(int *a, int *b, int *c, int wA, int wB, int hA)
 {
-    /* Split the work over chunks of 16 */
-    // global index
-    int gidx = blockDim.x * blockIdx.x + threadIdx.x;  // col
+    /* Blocksize is 16x16 */
+    /* Allocate shared memory */
+    __shared__ int aBlock[blockDim.x][blockDim.y];
+    __shared__ int bBlock[blockDim.x][blockDim.y];
+    
+    /* Calculate global index X, Y*/
+    int gidx = blockDim.x * blockIdx.x + threadIdx.x;  // column
     int gidy = blockDim.y * blockIdx.y + threadIdx.y;   // row
     
-    /* Check if gidx is in within limits */
+    /* Assign shared memory and sync  */
+    /* Warning, wA*gidy may be out of bounds */
+    aBlock[threadIdx.x][threadIdx.y] = a[gidy*wA + threadIdx.x];
+    bBlock[threadIdx.x][threadIdx.y] = b[threadIdx.y*wB + gidx];
+            
+    __syncThreads();
+    
+    /* Check if global IDs are within limits */
     if(gidx < wB && gidy < hA)
     {
         int sum = 0;
@@ -136,6 +147,9 @@ int main()
     // copy data back to CPU
     cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
 
+    // compare with cpu results
+    
+    
     
     // Check first and last memory location
     printf("Start: %d. Finish: %d.\n",c[2], c[wC * hC - 1]);
