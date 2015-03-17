@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 
 /**
  * KERNEL cuAdd() - Takes 2 input arrays of same size N and adds them into C.
@@ -7,7 +8,7 @@
  */
 __global__ void cuAdd(int *a,int *b,int *c, int N)
 {
-	// global index
+	// 1D global index
     int offset = blockDim.x * blockIdx.x + threadIdx.x;
     if(offset < N)
     {
@@ -20,23 +21,25 @@ __global__ void cuAdd(int *a,int *b,int *c, int N)
  * @param a - 1st Matrix
  * @param b - 2nd Matrix
  * @param c - Result Matrix
- * @param p - depth of matrix A and C
- * @param n - length of matrix B and C
- * @param m - length of A and depth of B
+ * @param wA - length of A and depth of B
+ * @param wB - length of matrix B and C
+ * @param hA - depth of matrix A and C
  */
-__global__ void cuMult(int *a, int *b, int *c, int wA, int wB)
+__global__ void cuMult(int *a, int *b, int *c, int wA, int wB, int hA)
 {
     // global index
     int gidx = blockDim.x * blockIdx.x + threadIdx.x;  // col
     int gidy = blockDim.y * blockIdx.y + threadIdx.y;   // row
     
-    int sum = 0;
-    for(int k=0;k<wA;k++)
+    if(gidx < wB && gidy < hA)
     {
-        sum += a[gidy*wA + k] * b[k*wB +gidx];
+        int sum = 0;
+        for(int k=0;k<wA;k++)
+        {
+            sum += a[gidy*hA + k] * b[k*wB +gidx];
+        }
+        c[gidy * wB + gidx] = sum;
     }
-    // c [gidy][gidx]
-    c[gidy * wB + gidx] = sum;
 }
 
 /**
@@ -48,12 +51,19 @@ __global__ void cuMult(int *a, int *b, int *c, int wA, int wB)
  * @param wB - length of matrix B and C
  * @param hA - depth of matrix A and C
  */
-__global__ void cuMultOpti(int *a, int *b, int *c, int wA, int wB, int hA)
+__global__ void cuMultOpti(
+        int *a,
+        int *b,
+        int *c,
+        int wA,
+        int wB,
+        int hA)
 {
+#define blockTile 16
     /* Blocksize is 16x16 */
     /* Allocate shared memory */
-    __shared__ int aBlock[blockDim.x][blockDim.y];
-    __shared__ int bBlock[blockDim.x][blockDim.y];
+    __shared__ int aBlock[blockTile][blockTile];
+    __shared__ int bBlock[blockTile][blockTile];
     
     /* Calculate global index X, Y*/
     int gidx = blockDim.x * blockIdx.x + threadIdx.x;  // column
@@ -63,19 +73,54 @@ __global__ void cuMultOpti(int *a, int *b, int *c, int wA, int wB, int hA)
     /* Warning, wA*gidy may be out of bounds */
     aBlock[threadIdx.x][threadIdx.y] = a[gidy*wA + threadIdx.x];
     bBlock[threadIdx.x][threadIdx.y] = b[threadIdx.y*wB + gidx];
-            
-    __syncThreads();
+    
+    __syncthreads();
     
     /* Check if global IDs are within limits */
     if(gidx < wB && gidy < hA)
     {
         int sum = 0;
-        for(int k=0;k<wA;k++)
+        for(int k=0; k<wA; k++)
         {
-            sum += a[gidy*wA + k] * b[k*wB + gidx];
+            sum += aBlock[threadIdx.y][k] * bBlock[k][threadIdx.x];
         }
         // c [gidy][gidx]
         c[gidy * wB + gidx] = sum;
+    }
+}
+
+/**
+ * HOST h_MatrixMult_Naive() - Takes two 2D matrices and multiplies them naively
+ * @param a - 1st Matrix
+ * @param b - 2nd Matrix
+ * @param c - Result Matrix
+ * @param wA - length of A and depth of B
+ * @param wB - length of matrix B and C
+ * @param hA - depth of matrix A and C
+ */
+void h_MatrixMult_Naive(
+        int *a,
+        int *b,
+        int *c,
+        int wA,
+        int wB,
+        int hA)
+{
+    // Iterate through all rows of a
+    for(int i=0; i<hA; i++)
+    {
+        // Iterate through all columns of b
+        for(int j=0; j<wB; j++)
+        {
+            // Calculate all of c[i][j] products
+            int sum = 0;
+            for(int k=0; k<wA; k++)
+            {
+                sum += a[i*hA + k] * b[k*wB + j];
+            }
+            // Index - row i of column j with column width of wB
+            c[i * wB + j] = sum;
+        }
     }
 }
 
@@ -86,8 +131,10 @@ __global__ void cuMultOpti(int *a, int *b, int *c, int wA, int wB, int hA)
  * displays results for error checking and frees allocated memory.
  * @return 
  */
-int main()
+int main(int argc, char ** argv)
 {
+    /**
+     *  Neutral - both for host and device */
     
     // width A
     int wA = 320;
@@ -108,17 +155,26 @@ int main()
 	
     
     // host 
-    int *a, *b, *c;
+    int *a, *b, *c;//, *hh_c;
     a = (int *) malloc(size_a);
     b = (int *) malloc(size_b);
     c = (int *) malloc(size_c);
-
+    /* Host test memory */
+    //hh_c = (int *) malloc(size_c);
+    
+    //assert(hh_c != NULL);
+    
+    /**
+     *  Device specific */
+    
     // device
     int *_a, *_b, *_c;
     cudaMalloc( (void **) &_a, size_a );
     cudaMalloc( (void **) &_b, size_b );
     cudaMalloc( (void **) &_c, size_c );
 
+    /**
+     Neutral */
     // initialize A
     for(int i=0; i < hA * wA; i++)
     {
@@ -131,6 +187,8 @@ int main()
         b[i] = 2;
     }
     
+    /**
+     Device*/
     
     // copy data to GPU
     cudaMemcpy(_a, a, size_a, cudaMemcpyHostToDevice);
@@ -142,22 +200,33 @@ int main()
     dim3 gridSize((wC+15)/16, (hC+15)/16);
         
     // kernel execution
-    cuMultOpti<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
+    cuMult<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
+    //cuMultOpti<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
 
     // copy data back to CPU
     cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
-
+    cudaDeviceSynchronize();
     // compare with cpu results
     
+    /**
+     Host*/
     
+    //h_MatrixMult_Naive(a, b, hh_c, wA, wB, hA);
     
     // Check first and last memory location
     printf("Start: %d. Finish: %d.\n",c[2], c[wC * hC - 1]);
     
+    /* Check */
+    // Naive check
     int k = 0;
     while(c[k] == c[k+1])
         k++;
-    printf("Breakpoint k = %d",k);
+    printf("EQ Test: Breakpoint @ %d\n",k);
+    // Device - Host check
+    k = 0;
+    //while(c[k] == hh_c[k])
+        k++;
+    printf("H2D Test: Breakpoint @ %d\n",k);
 
     // release resources
     cudaFree(_a);
@@ -167,6 +236,7 @@ int main()
     free(a);
     free(b);
     free(c);
+//    free(hh_c);
 
     return 0;
 }
