@@ -17,7 +17,7 @@ __global__ void cuAdd(int *a,int *b,int *c, int N)
 }
 
 /**
- * KERNL cuMult() - Takes two 2D matrices and multiplies them
+ * KERNEL cuMult() - Takes two 2D matrices and multiplies them
  * @param a - 1st Matrix
  * @param b - 2nd Matrix
  * @param c - Result Matrix
@@ -29,12 +29,12 @@ __global__ void cuMult(int *a, int *b, int *c, int wA, int wB, int hA)
 {
     // global index
     int gidx = blockDim.x * blockIdx.x + threadIdx.x;  // col
-    int gidy = blockDim.y * blockIdx.y + threadIdx.y;   // row
+    int gidy = blockDim.y * blockIdx.y + threadIdx.y;  // row
     
     if(gidx < wB && gidy < hA)
     {
         int sum = 0;
-        for(int k=0;k<wA;k++)
+        for(int k=0; k<wA; k++)
         {
             sum += a[gidy*hA + k] * b[k*wB +gidx];
         }
@@ -43,7 +43,7 @@ __global__ void cuMult(int *a, int *b, int *c, int wA, int wB, int hA)
 }
 
 /**
- * KERNL cuMultOpti() - Takes two 2D matrices and multiplies them optimally
+ * KERNEL cuMultOpti() - Takes two 2D matrices and multiplies them optimally
  * @param a - 1st Matrix
  * @param b - 2nd Matrix
  * @param c - Result Matrix
@@ -74,6 +74,7 @@ __global__ void cuMultOpti(
     aBlock[threadIdx.x][threadIdx.y] = a[gidy*wA + threadIdx.x];
     bBlock[threadIdx.x][threadIdx.y] = b[threadIdx.y*wB + gidx];
     
+    /* Make sure all of the threads have cached the memory */
     __syncthreads();
     
     /* Check if global IDs are within limits */
@@ -86,14 +87,15 @@ __global__ void cuMultOpti(
         }
         // c [gidy][gidx]
         c[gidy * wB + gidx] = sum;
+        
     }
 }
 
 /**
  * HOST h_MatrixMult_Naive() - Takes two 2D matrices and multiplies them naively
- * @param a - 1st Matrix
- * @param b - 2nd Matrix
- * @param c - Result Matrix
+ * @param a wA.hA - 1st Matrix
+ * @param b wB.wA - 2nd Matrix
+ * @param c hA.wB - Result Matrix
  * @param wA - length of A and depth of B
  * @param wB - length of matrix B and C
  * @param hA - depth of matrix A and C
@@ -118,6 +120,7 @@ void h_MatrixMult_Naive(
             {
                 sum += a[i*hA + k] * b[k*wB + j];
             }
+            assert(i*wB + j < hA*wB);
             // Index - row i of column j with column width of wB
             c[i * wB + j] = sum;
         }
@@ -133,9 +136,6 @@ void h_MatrixMult_Naive(
  */
 int main(int argc, char ** argv)
 {
-    /**
-     *  Neutral - both for host and device */
-    
     // width A
     int wA = 320;
     // height A
@@ -144,7 +144,29 @@ int main(int argc, char ** argv)
     // width B
     int wB = 320;
     // height B
-    int hB = 320;
+    int hB = wA;
+    
+    // value A
+    int aValue = 1;
+    // value B
+    int bValue = 2;
+    
+    /* Fetch the test parameters */
+    if(argc < 6)
+    {
+        printf("Using default parameters: 320 640 320 1 2\n");
+    }
+    else
+    {
+        wA = atoi(argv[1]);
+        hA = atoi(argv[2]);
+        wB = atoi(argv[3]);
+        hB = wA;
+        aValue = atoi(argv[4]);
+        bValue = atoi(argv[5]);
+    }
+    /**
+     *  Neutral - both for host and device */
     
     int wC = wB;
     int hC = hA;
@@ -155,14 +177,14 @@ int main(int argc, char ** argv)
 	
     
     // host 
-    int *a, *b, *c;//, *hh_c;
+    int *a, *b, *c, *hh_c;
     a = (int *) malloc(size_a);
     b = (int *) malloc(size_b);
     c = (int *) malloc(size_c);
     /* Host test memory */
-    //hh_c = (int *) malloc(size_c);
+    hh_c = (int *) malloc(size_c);
     
-    //assert(hh_c != NULL);
+    assert(hh_c != NULL);
     
     /**
      *  Device specific */
@@ -178,13 +200,13 @@ int main(int argc, char ** argv)
     // initialize A
     for(int i=0; i < hA * wA; i++)
     {
-        a[i] = 1;
+        a[i] = aValue;
     }
     
     // initialize B
     for(int i=0; i < hB * wB; i++)
     {
-        b[i] = 2;
+        b[i] = bValue;
     }
     
     /**
@@ -195,7 +217,7 @@ int main(int argc, char ** argv)
     cudaMemcpy(_b, b, size_b, cudaMemcpyHostToDevice);
 
     // x : col , y: row
-    dim3 blockSize(16,16); 
+    dim3 blockSize(16,16);
     // (N.x + blockSize.x - 1)/blockSize.x, (N.y + blockSize.y -1)/blockSize.y)
     dim3 gridSize((wC+15)/16, (hC+15)/16);
         
@@ -205,13 +227,12 @@ int main(int argc, char ** argv)
 
     // copy data back to CPU
     cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
-    cudaDeviceSynchronize();
-    // compare with cpu results
     
+    // compare with cpu results
     /**
      Host*/
     
-    //h_MatrixMult_Naive(a, b, hh_c, wA, wB, hA);
+    h_MatrixMult_Naive(a, b, hh_c, wA, wB, hA);
     
     // Check first and last memory location
     printf("Start: %d. Finish: %d.\n",c[2], c[wC * hC - 1]);
@@ -224,7 +245,7 @@ int main(int argc, char ** argv)
     printf("EQ Test: Breakpoint @ %d\n",k);
     // Device - Host check
     k = 0;
-    //while(c[k] == hh_c[k])
+    while(c[k] == hh_c[k])
         k++;
     printf("H2D Test: Breakpoint @ %d\n",k);
 
@@ -236,7 +257,7 @@ int main(int argc, char ** argv)
     free(a);
     free(b);
     free(c);
-//    free(hh_c);
+    free(hh_c);
 
     return 0;
 }
