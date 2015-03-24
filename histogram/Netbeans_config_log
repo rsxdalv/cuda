@@ -1,0 +1,16 @@
+Important project notes for Netbeans developing on CUDA C
+
++ MACROS :
+    "__x86_64__" (Actual architecture, should have been there already)
+    "__global__=" (Then IDE Doesn't see it (which is good.)
+    "__shared__="   -- ' ' --
+    "blockDim."     -- ' ' --
+    "blockIdx."     -- ' ' --
+    "threadIdx."    -- ' ' --
+
+Tool collection for CUDA:
+
+Libraries for CUDA:
+
+Libraries for GCC (of CUDA):
+

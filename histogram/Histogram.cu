@@ -1,5 +1,43 @@
+/*
+ * File: Histogram
+ * Author: Roberts Slisans
+ * Date: 03/24/2015 16:00
+ * Last updated: 03/24/2014 17:32
+ */
+
 #include <stdio.h>
 #include <assert.h>
+
+/**
+ * Calculates the histogram 256 with the CPU
+ * @param a - Input Data (1xN)
+ * @param H - Output 256x1 Histogram
+ * @param N - Length of a
+ */
+void hHistogram256(int *a, int *H, int N)
+{
+    /* Set the data to 0 before cumulative sum */
+    for(int i = 0; i < 256; ++i)
+    {
+        H[i] = 0;
+    }
+    /* Accumulate the sum for each data bin */
+    for(int i = 0; i < N; ++i)
+    {
+        /* Calculate the brightness value ( a % 256 placeholder) */
+        ++H[ a[i] % 256 ];
+    }
+}
+/**
+ * 
+ * @param a
+ * @param N
+ * @param H
+ */
+__global__ void dHistogram256_Atomic(int *a, int N, int *H)
+{
+    
+}
 
 /**
  * KERNEL cuAdd() - Takes 2 input arrays of same size N and adds them into C.
@@ -127,6 +165,8 @@ void h_MatrixMult_Naive(
         }
     }
 }
+
+
 
 /**
  * ENTRY main() - Tests <<<>>>cuMult() kernel: Initializes memory and data on

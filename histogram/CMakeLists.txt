@@ -29,12 +29,12 @@ link_directories(
 
 # Indicate target & source files to compile
 cuda_add_executable(
-MatrixMult
-MatrixMult.cu
+Histogram
+Histogram.cu
 )
 	 
 # Indicate target & libraries to link
 target_link_libraries(
-MatrixMult
+Histogram
 -lcudart
 ) 
