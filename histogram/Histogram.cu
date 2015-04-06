@@ -29,14 +29,21 @@ void hHistogram256(int *a, int *H, int N)
     }
 }
 /**
- * 
- * @param a
- * @param N
- * @param H
+ * Create a naive histogram using the atomic addition in global memory
+ * @param a - Input data 1xN
+ * @param N - Number of data points
+ * @param H - Histogram vector, initiated at 0, 1x256
  */
 __global__ void dHistogram256_Atomic(int *a, int N, int *H)
 {
-    
+    int gidx = blockDim.x * blockIdx.x + threadIdx.x;
+    if(gidx < 256)
+        H[gidx] = 0;
+    if(gidx < N)
+    {
+        // location = a%256;
+        atomicAdd(H[a[gidx] % 256], 1);
+    }
 }
 
 /**
