@@ -34,7 +34,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
-          <executablePath></executablePath>
+          <executablePath>MatrixMult</executablePath>
           <ccTool>
             <incDir>
               <pElem>../../../.cache/netbeans/8.0.2/remote-files/129.10.53.105_22_workshop/usr/local/cuda/include</pElem>
@@ -56,6 +56,48 @@
         </makeTool>
       </makefileType>
       <item path="MatrixMult.cu" ex="false" tool="1" flavor2="0">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+    </conf>
+    <conf name="Great_Test" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <flagsDictionary>
+        <element flagsID="0" commonFlags="-xc++ -O2 -m64"/>
+      </flagsDictionary>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath>MatrixMult</executablePath>
+          <ccTool>
+            <incDir>
+              <pElem>../../../.cache/netbeans/8.0.2/remote-files/129.10.53.105_22_workshop/usr/local/cuda/include</pElem>
+              <pElem>../../../.cache/netbeans/8.0.2/remote-files/129.10.53.105_22_workshop/usr/local/cuda/samples/common/inc</pElem>
+              <pElem>../../../.cache/netbeans/8.0.2/remote-files/129.10.53.105_22_workshop/usr/local/cuda/targets/x86_64-linux/include</pElem>
+              <pElem>CMakeFiles/MatrixMult.dir</pElem>
+            </incDir>
+            <incFile>
+              <pElem>../../../.cache/netbeans/8.0.2/remote-files/129.10.53.105_22_workshop/usr/local/cuda/include/cuda_runtime.h</pElem>
+            </incFile>
+            <preprocessorList>
+              <Elem>CUDA_DOUBLE_MATH_FUNCTIONS</Elem>
+              <Elem>NVCC</Elem>
+              <Elem>__CUDACC__</Elem>
+              <Elem>__CUDA_ARCH__=200</Elem>
+              <Elem>__NVCC__</Elem>
+            </preprocessorList>
+          </ccTool>
+        </makeTool>
+      </makefileType>
+      <item path="MatrixMult.cu" ex="false" tool="1" flavor2="9">
         <ccTool flags="0">
         </ccTool>
       </item>

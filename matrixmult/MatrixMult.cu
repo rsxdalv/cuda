@@ -36,7 +36,8 @@ __global__ void cuMult(int *a, int *b, int *c, int wA, int wB, int hA)
         int sum = 0;
         for(int k=0; k<wA; k++)
         {
-            sum += a[gidy*hA + k] * b[k*wB +gidx];
+            // Multiply row of A by column of B
+            sum += a[gidy*wA + k] * b[k*wB +gidx];
         }
         c[gidy * wB + gidx] = sum;
     }
@@ -76,6 +77,12 @@ __global__ void cuMultOpti(
     
     /* Make sure all of the threads have cached the memory */
     __syncthreads();
+    
+    /* Sliding multiples */
+    for(;;)
+    {
+        
+    }
     
     /* Check if global IDs are within limits */
     if(gidx < wB && gidy < hA)
@@ -118,7 +125,7 @@ void h_MatrixMult_Naive(
             int sum = 0;
             for(int k=0; k<wA; k++)
             {
-                sum += a[i*hA + k] * b[k*wB + j];
+                sum += a[i*wA + k] * b[k*wB + j];
             }
             assert(i*wB + j < hA*wB);
             // Index - row i of column j with column width of wB
