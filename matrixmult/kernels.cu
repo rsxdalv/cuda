@@ -1,9 +1,8 @@
 
 /**
- * KERNEL cuMult() - Takes two 2D matrices and multiplies them
+ * KERNEL d_MM() - Takes two 2D matrices and multiplies them
  * Result is divided into threads, each thread iterating over datasets
  * to obtain the final answer. C[Thread] = Sum { A column * B Row }
- * RENAME: d_MM
  * @param a - 1st Matrix
  * @param b - 2nd Matrix
  * @param c - Result Matrix
@@ -11,7 +10,7 @@
  * @param wB - length of matrix B and C
  * @param hA - depth of matrix A and C
  */
-__global__ void cuMult(float *a, float *b, float *c, int wA, int wB, int hA)
+__global__ void d_MM(float *a, float *b, float *c, int wA, int wB, int hA)
 {
     // global index
     int gidx = blockDim.x * blockIdx.x + threadIdx.x;  // col
@@ -30,7 +29,7 @@ __global__ void cuMult(float *a, float *b, float *c, int wA, int wB, int hA)
 }
 
 /**
- * KERNEL cuMultOpti() - Takes two 2D matrices and multiplies them optimally
+ * KERNEL d_MM_OPT() - Takes two 2D matrices and multiplies them optimally
  * Output set is divided into blocks of powers of two. 
  * RENAME: d_MM_OPT
  * @param a - 1st Matrix
@@ -40,7 +39,7 @@ __global__ void cuMult(float *a, float *b, float *c, int wA, int wB, int hA)
  * @param wB - length of matrix B and C
  * @param hA - depth of matrix A and C
  */
-__global__ void cuMultOpti(
+__global__ void d_MM_OPT(
         float *a,
         float *b,
         float *c,

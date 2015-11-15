@@ -1,6 +1,5 @@
 /**
  * HOST h_MatrixMult_Naive() - Takes two 2D matrices and multiplies them naively
- * Rename: H_MM
  * @param a wA.hA - 1st Matrix
  * @param b wB.wA - 2nd Matrix
  * @param c hA.wB - Result Matrix
@@ -8,7 +7,7 @@
  * @param wB - length of matrix B and C
  * @param hA - depth of matrix A and C
  */
-void h_MatrixMult_Naive(
+void h_MM(
         float *a,
         float *b,
         float *c,

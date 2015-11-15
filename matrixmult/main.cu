@@ -111,7 +111,7 @@ int main(int argc, char ** argv)
     cudaEvent_t start, stop;
 
     ///////////////////////////////////////////////////
-    // OPTIMIZED (What is?)
+    // OPTIMIZED (What is? CudaEvent ?)
     
     error = cudaEventCreate(&start);
     if (error != cudaSuccess)
@@ -141,7 +141,7 @@ int main(int argc, char ** argv)
 
 
     // kernel execution
-    cuMult<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
+    d_MM<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
 
     // Record the stop event
     error = cudaEventRecord(stop, NULL);
@@ -221,7 +221,7 @@ int main(int argc, char ** argv)
 
 
     // kernel execution
-    cuMultOpti<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
+    d_MM_OPT<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
 
     // Record the stop event
     error = cudaEventRecord(stop, NULL);
@@ -270,7 +270,7 @@ int main(int argc, char ** argv)
      Host*/
     double h_start, h_end;
     h_start = microSeconds();
-    h_MatrixMult_Naive(a, b, hh_c, wA, wB, hA);
+    h_MM(a, b, hh_c, wA, wB, hA);
     h_end = microSeconds();
     
     printf("%4.4f\t", (h_end - h_start) * 1000);
