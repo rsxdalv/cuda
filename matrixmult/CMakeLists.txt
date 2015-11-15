@@ -1,5 +1,9 @@
 # CMakeLists.txt for CUDA
 cmake_minimum_required( VERSION 2.8.0 )
+
+# FindCUDA.cmake Fix, since CMake defaults to "" 
+set( CUDA_TOOLKIT_ROOT_DIR "/usr/local/cuda/" )
+
 find_package(CUDA QUIET REQUIRED)
 
 # nvcc options
@@ -29,12 +33,12 @@ link_directories(
 
 # Indicate target & source files to compile
 cuda_add_executable(
-MatrixMult
-MatrixMult.cu
+MatrixMult # target
+main.cu # libraries
 )
 	 
 # Indicate target & libraries to link
 target_link_libraries(
-MatrixMult
--lcudart
+MatrixMult # target
+-lcudart # libraries
 ) 
