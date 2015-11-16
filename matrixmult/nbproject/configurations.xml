@@ -112,13 +112,15 @@
         <ccTool flags="0">
         </ccTool>
       </item>
-      <item path="hostKernels.cu" ex="false" tool="0" flavor2="0">
+      <item path="hostKernels.cu" ex="false" tool="0" flavor2="2">
       </item>
-      <item path="kernels.cu" ex="false" tool="0" flavor2="0">
+      <item path="kernels.cu" ex="false" tool="0" flavor2="2">
       </item>
-      <item path="main.cu" ex="false" tool="0" flavor2="0">
+      <item path="main.cu" ex="false" tool="1" flavor2="0">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="utils.cu" ex="false" tool="0" flavor2="0">
+      <item path="utils.cu" ex="false" tool="0" flavor2="2">
       </item>
     </conf>
   </confs>

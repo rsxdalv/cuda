@@ -1,9 +1,9 @@
-#Sun Nov 15 23:38:25 GMT 2015
+#Mon Nov 16 00:30:09 GMT 2015
 /home/roberts/NUCAR/Cuda/root/matrixmult/nbproject/project.xml=c1426631434000
-/home/roberts/NUCAR/Cuda/root/matrixmult/kernels.cu=c1447630692000
-/home/roberts/NUCAR/Cuda/root/matrixmult/main.cu=c1447621820000
+/home/roberts/NUCAR/Cuda/root/matrixmult/kernels.cu=c1447631760000
+/home/roberts/NUCAR/Cuda/root/matrixmult/main.cu=c1447633806000
 VERSION=1.3
-/home/roberts/NUCAR/Cuda/root/matrixmult/MatrixMult.cu=c1447630693000
-/home/roberts/NUCAR/Cuda/root/matrixmult/hostKernels.cu=c1447630680000
+/home/roberts/NUCAR/Cuda/root/matrixmult/MatrixMult.cu=c1447631449000
+/home/roberts/NUCAR/Cuda/root/matrixmult/hostKernels.cu=c1447631787000
 /home/roberts/NUCAR/Cuda/root/matrixmult/utils.cu=c1447630273000
-/home/roberts/NUCAR/Cuda/root/matrixmult/CMakeLists.txt=c1447619815000
+/home/roberts/NUCAR/Cuda/root/matrixmult/CMakeLists.txt=c1447631507000

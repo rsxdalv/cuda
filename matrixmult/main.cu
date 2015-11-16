@@ -106,7 +106,6 @@ int main(int argc, char ** argv)
     cudaMemcpy(_a, a, size_a, cudaMemcpyHostToDevice);
     cudaMemcpy(_b, b, size_b, cudaMemcpyHostToDevice);
 
-    /* TODO: Write _macro_ for the rounded off gridSize calculation */
     // x : col , y: row
 #define BLOCKSIZE_X 16
 #define BLOCKSIZE_Y 16
@@ -188,12 +187,15 @@ int main(int argc, char ** argv)
     // GEMM performs 4 floating point operations for one data output
     //double flops_sgemm = 4.0 * (double) NI * (double) NJ * (double) NK;
 
-    //double gigaFlops = (flops_sgemm * 1.0e-9f) / (sgemm_msec / 1000.f);
+    // Proposed flops for the d_MM:
+    // C = op( A )*op( B ), which is 1 per data output
+    double flops_sgemm = 1.0 * wC * hC * wA;
+    double gigaFlops = (flops_sgemm * 1.0e-9f) / (sgemm_msec / 1000.f);
+    
 
-    printf("Device Naive Time: %4.4fms\nWorkgroupSize= %u threads/block\n",
-                    //gigaFlops,
+    printf("Naive Results:\n %4.4f GFLOPS \t%4.4fms \t WorkgroupSize= %u threads/block\n",
+                    gigaFlops,
                     sgemm_msec,
-                    //flops_sgemm,
                     blockSize.x * blockSize.y);
     
     
@@ -260,10 +262,11 @@ int main(int argc, char ** argv)
             exit(EXIT_FAILURE);
     }
     
-    printf("Device Optimized Time: %4.4fms\nWorkgroupSize= %u threads/block\n",
-                    //gigaFlops,
+    gigaFlops = (flops_sgemm * 1.0e-9f) / (sgemm_msec / 1000.f);
+    
+    printf("Optimized Results:\n %4.4f GFLOPS \t%4.4fms \t WorkgroupSize= %u threads/block\n",
+                    gigaFlops,
                     sgemm_msec,
-                    //flops_sgemm,
                     blockSize.x * blockSize.y);
     
     
