@@ -1,4 +1,10 @@
 /**
+ * Project details:
+ *      Host: kepler1 (Ubuntu 14.04 LTS)
+ *      Hardware: GPUs k40c k20c
+ *      IDE: Netbeans 8.0.2
+ *      Goal: Benchmark highly optimized matrix multiplication with parallelization
+ * 
  * TODO: 
  *      Description including all the framework (Launch pad, Testing suite, Glue, Theory)
  *      Add function-lists to includes
@@ -102,9 +108,14 @@ int main(int argc, char ** argv)
 
     /* TODO: Write _macro_ for the rounded off gridSize calculation */
     // x : col , y: row
-    dim3 blockSize(16,16);
+#define BLOCKSIZE_X 16
+#define BLOCKSIZE_Y 16
+#define gridRound(width, blocksize) (width + blocksize - 1)/blocksize
+    dim3 blockSize(BLOCKSIZE_X, BLOCKSIZE_Y);
     // (N.x + blockSize.x - 1)/blockSize.x, (N.y + blockSize.y -1)/blockSize.y)
-    dim3 gridSize((wC+15)/16, (hC+15)/16);
+    
+    dim3 gridSize(gridRound(wC, BLOCKSIZE_X),
+            gridRound(hC, BLOCKSIZE_Y));
         
     cudaError_t error;
 
@@ -179,8 +190,7 @@ int main(int argc, char ** argv)
 
     //double gigaFlops = (flops_sgemm * 1.0e-9f) / (sgemm_msec / 1000.f);
 
-    printf("%.4f\t", sgemm_msec);
-    printf("N_Time: %.3f\n, WorkgroupSize= %u threads/block\n",
+    printf("Device Naive Time: %4.4fms\nWorkgroupSize= %u threads/block\n",
                     //gigaFlops,
                     sgemm_msec,
                     //flops_sgemm,
@@ -250,13 +260,11 @@ int main(int argc, char ** argv)
             exit(EXIT_FAILURE);
     }
     
-    printf("O_Time: %.3f\nWorkgroupSize= %u threads/block\n",
+    printf("Device Optimized Time: %4.4fms\nWorkgroupSize= %u threads/block\n",
                     //gigaFlops,
                     sgemm_msec,
                     //flops_sgemm,
                     blockSize.x * blockSize.y);
-    printf("%.4f\t", sgemm_msec);
-    
     
     
     // copy data back to CPU
@@ -268,30 +276,23 @@ int main(int argc, char ** argv)
     // compare with cpu results
     /**
      Host*/
+    /* Timing based on sys/time microseconds */
     double h_start, h_end;
     h_start = microSeconds();
     h_MM(a, b, hh_c, wA, wB, hA);
     h_end = microSeconds();
     
-    printf("%4.4f\t", (h_end - h_start) * 1000);
-    
-    /* Check */
-//    // Naive check
-//    int k = 0;
-//    while(c[k] == c[k+1])
-//        k++;
-//    printf("EQ Test: Breakpoint @ %d\n",k);
-    // Check first and last memory location
-    //printf("Start: %d. Finish: %d.\n",c[2], c[wC * hC - 1]);
+    printf("Host time: %4.4fs\n", (h_end - h_start) * 1000);
     
     /* TODO: Create test function */
-    int fail = 0;
-    for( int k = 0; k< wB*hA; k++)
+    int errors = 0;
+    for( int k = 0; k < wB*hA; k++)
     {
+        /* Make sure absolute difference is below a threshold */
         if(abs(c[k] - hh_c[k]) > 1e-5)
-            fail++;
+            errors++;
     }
-    printf("\nWorkgroup: %d Data: %d Failures: %d\n", blockSize.x*blockSize.y, wC, fail);
+    printf("\nWorkgroup Size: %d Data Width: %d Errors: %d\n", blockSize.x*blockSize.y, wC, errors);
 
     // release resources
     cudaFree(_a);
