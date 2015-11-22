@@ -10,11 +10,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/roberts/NUCAR/Cuda/root/matrixmult/hostKernels.cu</file>
-            <file>file:/home/roberts/NUCAR/Cuda/root/matrixmult/MatrixMult.cu</file>
-            <file>file:/home/roberts/NUCAR/Cuda/root/matrixmult/main.cu</file>
-            <file>file:/home/roberts/NUCAR/Cuda/root/matrixmult/kernels.cu</file>
-            <file>file:/home/roberts/NUCAR/Cuda/root/matrixmult/CMakeLists.txt</file>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/matrixmult/kernels.cu</file>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/matrixmult/main.cu</file>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/matrixmult/utils.cu</file>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/matrixmult/MatrixMult.cu</file>
         </group>
     </open-files>
 </project-private>

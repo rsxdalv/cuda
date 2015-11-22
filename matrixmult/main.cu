@@ -22,6 +22,81 @@
 
 #include "hostKernels.cu"
 
+enum KernelCode {
+    k_MM,
+    k_MM_OPT
+};
+
+void d_Benchmark_MM(enum KernelCode kid = k_MM,  // kernel specifier
+        gridSize, blockSize, // common launch parameters for all kernels
+        float *a, float *b, float *c, int wA, int wB, int hA) // kernel arguments
+{
+    
+    error = cudaEventCreate(&start);
+    if (error != cudaSuccess)
+    {
+            fprintf(stderr, "Failed to create start event (error code %s)!\n", 
+            cudaGetErrorString(error));
+            exit(EXIT_FAILURE);
+    }
+
+    error = cudaEventCreate(&stop);
+
+    if (error != cudaSuccess)
+    {
+            fprintf(stderr, "Failed to create stop event (error code %s)!\n", 
+            cudaGetErrorString(error));
+            exit(EXIT_FAILURE);
+    }
+
+    // Record the start event
+    error = cudaEventRecord(start, NULL);
+    if (error != cudaSuccess)
+    {
+            fprintf(stderr, "Failed to record start event (error code %s)!\n", 
+            cudaGetErrorString(error));
+            exit(EXIT_FAILURE);
+    }
+
+    // kernel call
+    switch(kid)
+    {
+        case k_MM:
+            d_MM<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
+            break;
+        case k_MM_OPT:
+            d_MM_OPT<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
+            break;
+    }
+
+    // Record the stop event
+    error = cudaEventRecord(stop, NULL);
+    if (error != cudaSuccess)
+    {
+            fprintf(stderr, "Failed to record stop event (error code %s)!\n", 
+            cudaGetErrorString(error));
+            exit(EXIT_FAILURE);
+    }
+
+    // Wait for the stop event to complete
+    error = cudaEventSynchronize(stop);
+    if (error != cudaSuccess)
+    {
+            fprintf(stderr, "Failed to synchronize on the stop event (error code %s)!\n", 
+            cudaGetErrorString(error));
+            exit(EXIT_FAILURE);
+    }
+
+    float sgemm_msec = 0.f;
+    error = cudaEventElapsedTime(&sgemm_msec, start, stop);
+    if (error != cudaSuccess)
+    {
+            fprintf(stderr, "Failed to get time elapsed between events (error code %s)!\n", 
+            cudaGetErrorString(error));
+            exit(EXIT_FAILURE);
+    }
+}
+
 /**
  * ENTRY main() - Tests <<<>>>cuMult() kernel: Initializes memory and data on
  * the host, then memory on the device. Copies the data from host to device,
@@ -115,6 +190,16 @@ int main(int argc, char ** argv)
     
     dim3 gridSize(gridRound(wC, BLOCKSIZE_X),
             gridRound(hC, BLOCKSIZE_Y));
+        
+    // Side by side test of the new kernel benchmark.
+    // Event functions might have trouble with this.
+    d_Benchmark_MM(KernelCode.d_MM,
+            blockSize, gridSize,
+            _a, _b, _c, wA, wB, hA);
+    
+    d_Benchmark_MM(KernelCode.d_MM_OPT,
+            blockSize, gridSize,
+            _a, _b, _c, wA, wB, hA);
         
     cudaError_t error;
 
@@ -230,7 +315,6 @@ int main(int argc, char ** argv)
             cudaGetErrorString(error));
             exit(EXIT_FAILURE);
     }
-
 
     // kernel execution
     d_MM_OPT<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);

@@ -13,8 +13,8 @@
   <confs>
     <conf name="Default" type="0">
       <toolsSet>
-        <developmentServer>workshop@129.10.53.105:22</developmentServer>
-        <platform>2</platform>
+        <developmentServer>roberts@kepler1.ece.neu.edu:22</developmentServer>
+        <platform>6</platform>
       </toolsSet>
       <compile>
         <compiledirpicklist>
@@ -63,7 +63,7 @@
     <conf name="Great_Test" type="0">
       <toolsSet>
         <developmentServer>roberts@kepler1.ece.neu.edu:22</developmentServer>
-        <platform>2</platform>
+        <platform>6</platform>
       </toolsSet>
       <compile>
         <compiledirpicklist>
