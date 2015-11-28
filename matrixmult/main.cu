@@ -27,10 +27,13 @@ enum KernelCode {
     k_MM_OPT
 };
 
-void d_Benchmark_MM(enum KernelCode kid = k_MM,  // kernel specifier
-        gridSize, blockSize, // common launch parameters for all kernels
-        float *a, float *b, float *c, int wA, int wB, int hA) // kernel arguments
+float d_Benchmark_MM(enum KernelCode kid,  // kernel specifier
+        //cudaError_t & error, cudaEvent_t & start, cudaEvent_t & stop,
+        dim3 gridSize, dim3 blockSize, // common launch parameters for all kernels
+        float * _a, float * _b, float * _c, int wA, int wB, int hA) // kernel arguments
 {
+    cudaError_t error;
+    cudaEvent_t start, stop;
     
     error = cudaEventCreate(&start);
     if (error != cudaSuccess)
@@ -41,7 +44,6 @@ void d_Benchmark_MM(enum KernelCode kid = k_MM,  // kernel specifier
     }
 
     error = cudaEventCreate(&stop);
-
     if (error != cudaSuccess)
     {
             fprintf(stderr, "Failed to create stop event (error code %s)!\n", 
@@ -62,11 +64,16 @@ void d_Benchmark_MM(enum KernelCode kid = k_MM,  // kernel specifier
     switch(kid)
     {
         case k_MM:
+            fprintf(stderr, "Benchmark of d_MM \n");
             d_MM<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
             break;
         case k_MM_OPT:
+            fprintf(stderr, "Benchmark of d_MM_OPT \n");
             d_MM_OPT<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
             break;
+        default:
+            fprintf(stderr, "No Kernel Code!\n");
+            return 0.f;
     }
 
     // Record the stop event
@@ -87,14 +94,30 @@ void d_Benchmark_MM(enum KernelCode kid = k_MM,  // kernel specifier
             exit(EXIT_FAILURE);
     }
 
-    float sgemm_msec = 0.f;
-    error = cudaEventElapsedTime(&sgemm_msec, start, stop);
+    float GEMM_ms = 0.f;
+    error = cudaEventElapsedTime(&GEMM_ms, start, stop);
     if (error != cudaSuccess)
     {
             fprintf(stderr, "Failed to get time elapsed between events (error code %s)!\n", 
             cudaGetErrorString(error));
             exit(EXIT_FAILURE);
     }
+    
+    int wC = wB;
+    int hC = hA;
+    
+    // Calculate the number of FLOP
+    const double FLOP_GEMM = 1.0 * wC * hC * wA;
+    // Calculate the giga flops per second
+    double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (GEMM_ms / 1000.f);
+    
+    // Print the results in a table
+    printf("Results:\n %4.4f GFLOPS \t%4.4fms \t WorkgroupSize= %u threads/block\n",
+                    gigaFLOPS,
+                    GEMM_ms,
+                    blockSize.x * blockSize.y);
+    
+    return GEMM_ms;
 }
 
 /**
@@ -193,183 +216,42 @@ int main(int argc, char ** argv)
         
     // Side by side test of the new kernel benchmark.
     // Event functions might have trouble with this.
-    d_Benchmark_MM(KernelCode.d_MM,
-            blockSize, gridSize,
+    
+    
+    // Benchmark Matrix Multiplication Naive kernel
+    d_Benchmark_MM(k_MM,
+            //error, start, stop,
+            gridSize, blockSize,
             _a, _b, _c, wA, wB, hA);
     
-    d_Benchmark_MM(KernelCode.d_MM_OPT,
-            blockSize, gridSize,
+    // Benchmark Matrix Multiplication Optimized kernel
+    d_Benchmark_MM(k_MM_OPT,
+            //error, start, stop,
+            gridSize, blockSize,
             _a, _b, _c, wA, wB, hA);
-        
-    cudaError_t error;
 
-    cudaEvent_t start, stop;
-
-    ///////////////////////////////////////////////////
-    // OPTIMIZED (What is? CudaEvent ?)
-    
-    error = cudaEventCreate(&start);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to create start event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    error = cudaEventCreate(&stop);
-
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to create stop event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    // Record the start event
-    error = cudaEventRecord(start, NULL);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to record start event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-
-    // kernel execution
-    d_MM<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
-
-    // Record the stop event
-    error = cudaEventRecord(stop, NULL);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to record stop event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    // Wait for the stop event to complete
-    error = cudaEventSynchronize(stop);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to synchronize on the stop event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    float sgemm_msec = 0.f;
-    error = cudaEventElapsedTime(&sgemm_msec, start, stop);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to get time elapsed between events (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-
-
-    /* Comments about GEMM of the benchmark toolkit */
-    // C := alpha*op( A )*op( B ) + beta*C
-    // GEMM performs 4 floating point operations for one data output
-    //double flops_sgemm = 4.0 * (double) NI * (double) NJ * (double) NK;
-
-    // Proposed flops for the d_MM:
-    // C = op( A )*op( B ), which is 1 per data output
-    double flops_sgemm = 1.0 * wC * hC * wA;
-    double gigaFlops = (flops_sgemm * 1.0e-9f) / (sgemm_msec / 1000.f);
-    
-
-    printf("Naive Results:\n %4.4f GFLOPS \t%4.4fms \t WorkgroupSize= %u threads/block\n",
-                    gigaFlops,
-                    sgemm_msec,
-                    blockSize.x * blockSize.y);
-    
-    
-    // copy data back to CPU
-    cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
-    
-    /////////////////////////////////////////////////
-    // OPTIMIZED
-    
-    error = cudaEventCreate(&start);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to create start event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    error = cudaEventCreate(&stop);
-
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to create stop event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    // Record the start event
-    error = cudaEventRecord(start, NULL);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to record start event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    // kernel execution
-    d_MM_OPT<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
-
-    // Record the stop event
-    error = cudaEventRecord(stop, NULL);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to record stop event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    // Wait for the stop event to complete
-    error = cudaEventSynchronize(stop);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to synchronize on the stop event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    sgemm_msec = 0.f;
-    error = cudaEventElapsedTime(&sgemm_msec, start, stop);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to get time elapsed between events (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-    
-    gigaFlops = (flops_sgemm * 1.0e-9f) / (sgemm_msec / 1000.f);
-    
-    printf("Optimized Results:\n %4.4f GFLOPS \t%4.4fms \t WorkgroupSize= %u threads/block\n",
-                    gigaFlops,
-                    sgemm_msec,
-                    blockSize.x * blockSize.y);
-    
-    
     // copy data back to CPU
     cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
     
     //////////////////////////////////////////////////
-    // HOST
-    
-    // compare with cpu results
-    /**
-     Host*/
-    /* Timing based on sys/time microseconds */
-    double h_start, h_end;
-    h_start = microSeconds();
+    // HOST Benchmark \w Timing based on sys/time microseconds
+    // Record starting time
+    double h_start = microSeconds();
+    // Execute kernel
     h_MM(a, b, hh_c, wA, wB, hA);
-    h_end = microSeconds();
+    // Record ending time
+    double h_end = microSeconds();
+    double h_MM_ms = (h_end - h_start) * 1000;
+  
+    // Calculate the number of FLOP
+    const double FLOP_GEMM = 1.0 * wC * hC * wA;
+    // Calculate the giga flops per second
+    double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (h_MM_ms / 1000.f);
     
-    printf("Host time: %4.4fs\n", (h_end - h_start) * 1000);
+    // Print the results in a table
+    printf("Benchmark of h_MM\nResults:\n %4.4f GFLOPS \t%4.4fms\n",
+                    gigaFLOPS,
+                    h_MM_ms);
     
     /* TODO: Create test function */
     int errors = 0;
@@ -379,7 +261,7 @@ int main(int argc, char ** argv)
         if(abs(c[k] - hh_c[k]) > 1e-5)
             errors++;
     }
-    printf("\nWorkgroup Size: %d Data Width: %d Errors: %d\n", blockSize.x*blockSize.y, wC, errors);
+    printf("Errors: %d\n", errors);
 
     // release resources
     cudaFree(_a);
