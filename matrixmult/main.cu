@@ -22,113 +22,17 @@
 
 #include "hostKernels.cu"
 
-enum KernelCode {
-    k_MM,
-    k_MM_OPT
-};
-
-float d_Benchmark_MM(enum KernelCode kid,  // kernel specifier
-        //cudaError_t & error, cudaEvent_t & start, cudaEvent_t & stop,
-        dim3 gridSize, dim3 blockSize, // common launch parameters for all kernels
-        float * _a, float * _b, float * _c, int wA, int wB, int hA) // kernel arguments
-{
-    cudaError_t error;
-    cudaEvent_t start, stop;
-    
-    error = cudaEventCreate(&start);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to create start event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    error = cudaEventCreate(&stop);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to create stop event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    // Record the start event
-    error = cudaEventRecord(start, NULL);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to record start event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    // kernel call
-    switch(kid)
-    {
-        case k_MM:
-            fprintf(stderr, "Benchmark of d_MM \n");
-            d_MM<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
-            break;
-        case k_MM_OPT:
-            fprintf(stderr, "Benchmark of d_MM_OPT \n");
-            d_MM_OPT<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
-            break;
-        default:
-            fprintf(stderr, "No Kernel Code!\n");
-            return 0.f;
-    }
-
-    // Record the stop event
-    error = cudaEventRecord(stop, NULL);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to record stop event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    // Wait for the stop event to complete
-    error = cudaEventSynchronize(stop);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to synchronize on the stop event (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-
-    float GEMM_ms = 0.f;
-    error = cudaEventElapsedTime(&GEMM_ms, start, stop);
-    if (error != cudaSuccess)
-    {
-            fprintf(stderr, "Failed to get time elapsed between events (error code %s)!\n", 
-            cudaGetErrorString(error));
-            exit(EXIT_FAILURE);
-    }
-    
-    int wC = wB;
-    int hC = hA;
-    
-    // Calculate the number of FLOP
-    const double FLOP_GEMM = 1.0 * wC * hC * wA;
-    // Calculate the giga flops per second
-    double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (GEMM_ms / 1000.f);
-    
-    // Print the results in a table
-    printf("Results:\n %4.4f GFLOPS \t%4.4fms \t WorkgroupSize= %u threads/block\n",
-                    gigaFLOPS,
-                    GEMM_ms,
-                    blockSize.x * blockSize.y);
-    
-    return GEMM_ms;
-}
+#include "kernelBenchmark.cu"
 
 /**
- * ENTRY main() - Tests <<<>>>cuMult() kernel: Initializes memory and data on
- * the host, then memory on the device. Copies the data from host to device,
- * executes kernel with memory device pointers, copies result back to host,
- * displays results for error checking and frees allocated memory.
- * @return 
+ * Tests matrix multiplication on 2 kernels and 1 host algorithm, by setting up
+ * the variables, allocating and initializing the memory, measuring the time,
+ * showing the results, and cleaning up.
  */
 int main(int argc, char ** argv)
 {
+    // TODO: CREATE TESTING PARAMETER PARSER THAT ALLOWS FOR PARTIAL DEFAULT VALUES
+    
     // width A
     int wA = 512;
     // height A
@@ -197,26 +101,25 @@ int main(int argc, char ** argv)
     }
     
     /* 
-     * Device 
+     * Device Specific Routine
      */
     
-    // copy data to GPU
+    // copy initialized data to GPU
     cudaMemcpy(_a, a, size_a, cudaMemcpyHostToDevice);
     cudaMemcpy(_b, b, size_b, cudaMemcpyHostToDevice);
 
-    // x : col , y: row
+    // x : columns , y: rows
 #define BLOCKSIZE_X 16
 #define BLOCKSIZE_Y 16
+    
+    // Shorthand for int rounding
 #define gridRound(width, blocksize) (width + blocksize - 1)/blocksize
-    dim3 blockSize(BLOCKSIZE_X, BLOCKSIZE_Y);
     // (N.x + blockSize.x - 1)/blockSize.x, (N.y + blockSize.y -1)/blockSize.y)
+    
+    dim3 blockSize(BLOCKSIZE_X, BLOCKSIZE_Y);
     
     dim3 gridSize(gridRound(wC, BLOCKSIZE_X),
             gridRound(hC, BLOCKSIZE_Y));
-        
-    // Side by side test of the new kernel benchmark.
-    // Event functions might have trouble with this.
-    
     
     // Benchmark Matrix Multiplication Naive kernel
     d_Benchmark_MM(k_MM,

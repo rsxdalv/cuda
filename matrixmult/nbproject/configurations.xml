@@ -4,6 +4,7 @@
     <df root="." name="0">
       <in>MatrixMult.cu</in>
       <in>hostKernels.cu</in>
+      <in>kernelBenchmark.cu</in>
       <in>kernels.cu</in>
       <in>main.cu</in>
       <in>utils.cu</in>
@@ -65,6 +66,8 @@
       </item>
       <item path="hostKernels.cu" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="kernelBenchmark.cu" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="kernels.cu" ex="false" tool="0" flavor2="0">
       </item>
       <item path="main.cu" ex="false" tool="0" flavor2="0">
@@ -89,15 +92,12 @@
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
           <executablePath>MatrixMult</executablePath>
-          <ccTool>
+          <cTool>
             <incDir>
-              <pElem>../../../../.cache/netbeans/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/include</pElem>
-              <pElem>../../../../.cache/netbeans/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/samples/common/inc</pElem>
-              <pElem>CMakeFiles/MatrixMult.dir</pElem>
+              <pElem></pElem>
             </incDir>
-            <incFile>
-              <pElem>../../../../.cache/netbeans/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/include/cuda_runtime.h</pElem>
-            </incFile>
+          </cTool>
+          <ccTool>
             <preprocessorList>
               <Elem>CUDA_DOUBLE_MATH_FUNCTIONS</Elem>
               <Elem>NVCC</Elem>
@@ -110,14 +110,33 @@
       </makefileType>
       <item path="MatrixMult.cu" ex="false" tool="1" flavor2="9">
         <ccTool flags="0">
+          <incDir>
+            <pElem>../../../../.cache/netbeans/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/include</pElem>
+            <pElem>../../../../.cache/netbeans/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/samples/common/inc</pElem>
+            <pElem>CMakeFiles/MatrixMult.dir</pElem>
+            <pElem></pElem>
+          </incDir>
+          <incFile>
+            <pElem>../../../../.cache/netbeans/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/include/cuda_runtime.h</pElem>
+          </incFile>
         </ccTool>
       </item>
       <item path="hostKernels.cu" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="kernelBenchmark.cu" ex="false" tool="1" flavor2="0">
       </item>
       <item path="kernels.cu" ex="false" tool="0" flavor2="2">
       </item>
       <item path="main.cu" ex="false" tool="1" flavor2="0">
         <ccTool flags="0">
+          <incDir>
+            <pElem>../../../../AppData/Local/NetBeans/Cache/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/include</pElem>
+            <pElem>../../../../AppData/Local/NetBeans/Cache/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/samples/common/inc</pElem>
+            <pElem>CMakeFiles/MatrixMult.dir</pElem>
+          </incDir>
+          <incFile>
+            <pElem>../../../../AppData/Local/NetBeans/Cache/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/include/cuda_runtime.h</pElem>
+          </incFile>
         </ccTool>
       </item>
       <item path="utils.cu" ex="false" tool="0" flavor2="2">
