@@ -1,3 +1,5 @@
+#include <sys/time.h>
+
 double microSeconds()
 {
     struct timeval Tp;

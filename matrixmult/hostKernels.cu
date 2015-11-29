@@ -27,7 +27,7 @@ void h_MM(
             {
                 sum += a[i*wA + k] * b[k*wB + j];
             }
-            assert(i*wB + j < hA*wB);
+            //assert(i*wB + j < hA*wB);
             // Index - row i of column j with column width of wB
             c[i * wB + j] = sum;
         }
