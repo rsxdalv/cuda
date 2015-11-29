@@ -22,11 +22,17 @@
 // double microseconds();
 #include "utils.cu"
 
+// d_MM, d_MM_OPT
 #include "kernels.cu"
 
+// h_MM
 #include "hostKernels.cu"
 
+// d_Benchmark
 #include "kernelBenchmark.cu"
+
+// VerifyCalculation(*c, *hh_c, threshold)
+#include "verificator.cu"
 
 /**
  * Tests matrix multiplication on 2 kernels and 1 host algorithm, by setting up
@@ -35,63 +41,19 @@
  */
 int main(int argc, char ** argv)
 {
-    // TODO: CREATE TESTING PARAMETER PARSER THAT ALLOWS FOR PARTIAL DEFAULT VALUES
-    
-//    int aflag = 0;
-//    int bflag = 0;
-//    char *cvalue = NULL;
-//    int index;
-//    int c;
-//
-//    opterr = 0;
-//
-//    while ((c = getopt (argc, argv, "abc:")) != -1)
-//        switch (c)
-//        {
-//        case 'a':
-//            aflag = 1;
-//            break;
-//        case 'b':
-//            bflag = 1;
-//            break;
-//        case 'c':
-//            cvalue = optarg;
-//            break;
-//        case '?':
-//            if (optopt == 'c')
-//              fprintf (stderr, "Option -%c requires an argument.\n", optopt);
-//            else if (isprint (optopt))
-//              fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-//            else
-//              fprintf (stderr,
-//                       "Unknown option character `\\x%x'.\n",
-//                       optopt);
-//            return 1;
-//        default:
-//          abort ();
-//        }
-//
-//    printf ("aflag = %d, bflag = %d, cvalue = %s\n",
-//            aflag, bflag, cvalue);
-    
-    
     // width A - a
     int wA = 512;
     // height A - h
     int hA = 512;
-    
     // width B - b
     int wB = 512;
-    
     // value A - x
     float aValue = 1.0;
     // value B - y
     float bValue = 2.0;
     
     opterr = 0;
-    
     int getopt_state = 0;
-
     while ((getopt_state = getopt (argc, argv, "a:h:b:x:y:")) != -1)
         switch (getopt_state)
         {
@@ -117,21 +79,6 @@ int main(int argc, char ** argv)
                 fprintf(stderr, "GetOpt failure or uncaught option!\n");
                 break;
         }
-    
-//    /* Fetch the test parameters */
-//    if(argc < 6)
-//    {
-//        printf("Using default parameters: 320 640 320 1 2\n");
-//    }
-//    else
-//    {
-//        wA = atoi(argv[1]);
-//        hA = atoi(argv[2]);
-//        wB = atoi(argv[3]);
-//        hB = wA;
-//        aValue = atoi(argv[4]);
-//        bValue = atoi(argv[5]);
-//    }
     /**
      *  Neutral - both for host and device */
     
@@ -162,12 +109,12 @@ int main(int argc, char ** argv)
     cudaMalloc( (void **) &_c, size_c );
 
     /* Input initialization */
-    for(int i=0; i < hA * wA; i++)
+    for(int i = 0; i < hA * wA; i++)
     {
         a[i] = aValue;
     }
     
-    for(int i=0; i < hB * wB; i++)
+    for(int i = 0; i < hB * wB; i++)
     {
         b[i] = bValue;
     }
@@ -228,15 +175,7 @@ int main(int argc, char ** argv)
                     gigaFLOPS,
                     h_MM_ms);
     
-    /* TODO: Create test function */
-    int errors = 0;
-    for( int k = 0; k < wB*hA; k++)
-    {
-        /* Make sure absolute difference is below a threshold */
-        if(abs(c[k] - hh_c[k]) > 1e-5)
-            errors++;
-    }
-    printf("Errors: %d\n", errors);
+    VerifyCalculation(c, hh_c, 1e-5);
 
     // release resources
     cudaFree(_a);

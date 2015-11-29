@@ -8,6 +8,7 @@
       <in>kernels.cu</in>
       <in>main.cu</in>
       <in>utils.cu</in>
+      <in>verificator.cu</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -73,6 +74,8 @@
       <item path="main.cu" ex="false" tool="0" flavor2="0">
       </item>
       <item path="utils.cu" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="verificator.cu" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
     <conf name="Great_Test" type="0">
@@ -140,6 +143,8 @@
         </ccTool>
       </item>
       <item path="utils.cu" ex="false" tool="0" flavor2="2">
+      </item>
+      <item path="verificator.cu" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>
