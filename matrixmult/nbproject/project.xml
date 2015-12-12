@@ -28,6 +28,10 @@
         </data>
         <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
             <word>blocksize</word>
+            <word>fprintf</word>
+            <word>getopt</word>
+            <word>gettimeofday</word>
+            <word>printf</word>
         </spellchecker-wordlist>
     </configuration>
 </project>

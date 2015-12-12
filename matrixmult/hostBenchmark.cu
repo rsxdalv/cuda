@@ -28,7 +28,7 @@ void h_Benchmark(float *a, float *b, float *hh_c, int wA, int wB, int hA)
     
     // Calculate the number of FLOP
     const double FLOP_GEMM = 1.0 * wC * hC * wA;
-    // Calculate the giga flops per second
+    // Calculate the gigaflops per second
     double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (h_MM_ms / 1000.f);
     
     // Print the results in a table

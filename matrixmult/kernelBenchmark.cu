@@ -84,7 +84,7 @@ float d_Benchmark_MM(enum KernelCode kid,  // kernel specifier
     
     // Calculate the number of FLOP
     const double FLOP_GEMM = 1.0 * wC * hC * wA;
-    // Calculate the giga flops per second
+    // Calculate the gigaflops per second
     double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (GEMM_ms / 1000.f);
     
     // Print the results in a table

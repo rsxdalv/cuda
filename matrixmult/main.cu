@@ -9,9 +9,9 @@
  *      Create register pressure aware kernels
  */
 // Some standard libraries are included as per CMake configuration.
-// TODO: Add the list of them /usr/local/cuda/lib64
+//      TODO: Add the list of them /usr/local/cuda/lib64
 
-// printf() - Text output via fprintf()
+// fprintf() - for errors and results
 #include <stdio.h>
 // getopt() - Command line argument parsing
 #include <unistd.h>
@@ -92,13 +92,14 @@ int main(int argc, char ** argv)
 	
     
     /* Host memory initialization */
-    float *a, *b, *c, *hh_c;
+    float *a, *b, *c, *hh_c, *c_naive;
     a = (float *) malloc(size_a);
     b = (float *) malloc(size_b);
     hh_c = (float *) malloc(size_c);
     
     /* Device output memory */
     c = (float *) malloc(size_c);
+    c_naive = (float *) malloc(size_c);
     
     if( a == NULL || b == NULL || c == NULL || hh_c == NULL )
     {
@@ -111,6 +112,7 @@ int main(int argc, char ** argv)
     }
     
     /* Device Memory Initialization */
+    // TODO: Add custom try-catch to reduce redundancy 
     cudaError_t error;
     float *_a, *_b, *_c;
     
@@ -158,7 +160,7 @@ int main(int argc, char ** argv)
             _a, _b, _c, wA, wB, hA);
                 
     // Obtain Device Kernel Results
-    cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
+    cudaMemcpy(c_naive, _c, size_c, cudaMemcpyDeviceToHost);
     
     // Benchmark Matrix Multiplication Optimized kernel
     d_Benchmark_MM(k_MM_OPT,
@@ -185,6 +187,7 @@ int main(int argc, char ** argv)
     free(b);
     free(c);
     free(hh_c);
+    free(c_naive);
 
     return 0;
 }
