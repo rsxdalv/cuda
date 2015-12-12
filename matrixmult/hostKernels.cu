@@ -1,5 +1,5 @@
 /**
- * HOST h_MatrixMult_Naive() - Takes two 2D matrices and multiplies them naively
+ * HOST h_MM() - Takes two 2D matrices and multiplies them naively
  * @param a wA.hA - 1st Matrix
  * @param b wB.wA - 2nd Matrix
  * @param c hA.wB - Result Matrix

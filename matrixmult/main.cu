@@ -95,7 +95,7 @@ int main(int argc, char ** argv)
                 "%p\t%p\t%p\t%p\n"
                 "Aborting...\n", 
                 a, b, c, hh_c);
-        return 1;
+        exit(EXIT_FAILURE);
     }
     
     /* Device Memory Initialization */
@@ -114,11 +114,12 @@ int main(int argc, char ** argv)
         if ( error != cudaSuccess )
             throw error;
     }
-    catch (...)
+    catch(cudaError_t error)
     {
-        fprintf(stderr, "Device memory allocation failure!\n");
-        return 1;
+        fprintf(stderr, "Failure in device memory allocation (error code %s)!\n", cudaGetErrorString(error));
+        exit(EXIT_FAILURE);
     }
+    
     /* Input memory initialization */
     for(int i = 0; i < hA * wA; i++)
         a[i] = aValue;
