@@ -37,9 +37,9 @@
 int main(int argc, char ** argv)
 {
     // width 'a', height 'h', width 'b'
-    int     wA = 512,
-            hA = 512,
-            wB = 512;
+    int     wA = 128,
+            hA = 128,
+            wB = 128;
     
     // value 'x', value 'y'
     float   aValue = 1.0,
@@ -74,7 +74,8 @@ int main(int argc, char ** argv)
                 break;
         }
         
-    printf( "wA\thA\twB\ta\tb\n"
+    printf( "Experiment setup:\n"
+            "wA\thA\twB\ta\tb\n"
             "%d\t%d\t%d\t%1.2f\t%1.2f\n", 
             wA, hA, wB, aValue, bValue);
     
@@ -96,11 +97,11 @@ int main(int argc, char ** argv)
     a = (float *) malloc(size_a);
     b = (float *) malloc(size_b);
     hh_c = (float *) malloc(size_c);
-    
+
     /* Device output memory */
     c = (float *) malloc(size_c);
     c_naive = (float *) malloc(size_c);
-    
+     
     if( a == NULL || b == NULL || c == NULL || hh_c == NULL )
     {
         fprintf(stderr, "Host memory allocation error!\n"
@@ -112,20 +113,26 @@ int main(int argc, char ** argv)
     }
     
     /* Device Memory Initialization */
-    // TODO: Add custom try-catch to reduce redundancy 
     cudaError_t error;
     float *_a, *_b, *_c;
     
-    error = cudaMalloc( (void **) &_a, size_a );
-    if ( error != cudaSuccess )
-        fprintf(stderr, "Device memory allocation failure (Matrix A)!\n");
-    error = cudaMalloc( (void **) &_b, size_b );
-    if ( error != cudaSuccess )
-        fprintf(stderr, "Device memory allocation failure (Matrix B)!\n");
-    error = cudaMalloc( (void **) &_c, size_c );
-    if ( error != cudaSuccess )
-        fprintf(stderr, "Device memory allocation failure (Matrix C)!\n");
-    
+    try
+    {
+        error = cudaMalloc( (void **) &_a, size_a );
+        if ( error != cudaSuccess )
+            throw error;
+        error = cudaMalloc( (void **) &_b, size_b );
+        if ( error != cudaSuccess )
+            throw error;
+        error = cudaMalloc( (void **) &_c, size_c );
+        if ( error != cudaSuccess )
+            throw error;
+    }
+    catch (...)
+    {
+        fprintf(stderr, "Device memory allocation failure!\n");
+        return 1;
+    }
     /* Input memory initialization */
     for(int i = 0; i < hA * wA; i++)
         a[i] = aValue;
