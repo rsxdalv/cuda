@@ -111,10 +111,18 @@ int main(int argc, char ** argv)
     }
     
     /* Device Memory Initialization */
+    cudaError_t error;
     float *_a, *_b, *_c;
-    cudaMalloc( (void **) &_a, size_a );
-    cudaMalloc( (void **) &_b, size_b );
-    cudaMalloc( (void **) &_c, size_c );
+    
+    error = cudaMalloc( (void **) &_a, size_a );
+    if ( error != cudaSuccess )
+        fprintf(stderr, "Device memory allocation failure (Matrix A)!\n");
+    error = cudaMalloc( (void **) &_b, size_b );
+    if ( error != cudaSuccess )
+        fprintf(stderr, "Device memory allocation failure (Matrix B)!\n");
+    error = cudaMalloc( (void **) &_c, size_c );
+    if ( error != cudaSuccess )
+        fprintf(stderr, "Device memory allocation failure (Matrix C)!\n");
     
     /* Input memory initialization */
     for(int i = 0; i < hA * wA; i++)
