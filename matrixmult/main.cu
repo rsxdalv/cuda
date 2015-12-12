@@ -97,7 +97,15 @@ int main(int argc, char ** argv)
     /* Host testing memory */
     hh_c = (float *) malloc(size_c);
     
-    //assert(hh_c != NULL);
+    if( a == NULL || b == NULL || c == NULL || hh_c == NULL )
+    {
+        fprintf(stderr, "Host memory allocation error!\n"
+                "*a\t*b\t*c\t*hh_c\n"
+                "%p\t%p\t%p\t%p\n"
+                "Aborting...\n", 
+                a, b, c, hh_c);
+        return 1;
+    }
     
     /* Device Memory Initialization */
     float *_a, *_b, *_c;
