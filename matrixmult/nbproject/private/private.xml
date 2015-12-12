@@ -10,7 +10,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/matrixmult/kernelBenchmark.cu</file>
             <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/matrixmult/verificator.cu</file>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/matrixmult/main.cu</file>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/matrixmult/hostBenchmark.cu</file>
         </group>
     </open-files>
 </project-private>

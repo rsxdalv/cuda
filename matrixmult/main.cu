@@ -34,6 +34,9 @@
 // VerifyCalculation(*c, *hh_c, threshold)
 #include "verificator.cu"
 
+// h_Benchmark
+#include "hostBenchmark.cu"
+
 /**
  * Tests matrix multiplication on 2 kernels and 1 host algorithm, by setting up
  * the variables, allocating and initializing the memory, measuring the time,
@@ -79,6 +82,8 @@ int main(int argc, char ** argv)
                 fprintf(stderr, "GetOpt failure or uncaught option!\n");
                 break;
         }
+        
+    printf("wA\thA\twB\ta\tb\n%d\t%d\t%d\t%1.2f\t%1.2f\n", wA, hA, wB, aValue, bValue);
     /**
      *  Neutral - both for host and device */
     
@@ -110,14 +115,10 @@ int main(int argc, char ** argv)
 
     /* Input initialization */
     for(int i = 0; i < hA * wA; i++)
-    {
         a[i] = aValue;
-    }
     
     for(int i = 0; i < hB * wB; i++)
-    {
         b[i] = bValue;
-    }
     
     /* 
      * Device Specific Routine
@@ -156,27 +157,10 @@ int main(int argc, char ** argv)
     cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
     
     //////////////////////////////////////////////////
-    // HOST Benchmark \w Timing based on sys/time microseconds
-    // Record starting time
-    double h_start = microSeconds();
-    // Execute kernel
-    h_MM(a, b, hh_c, wA, wB, hA);
-    // Record ending time
-    double h_end = microSeconds();
-    double h_MM_ms = (h_end - h_start) * 1000;
-  
-    // Calculate the number of FLOP
-    const double FLOP_GEMM = 1.0 * wC * hC * wA;
-    // Calculate the giga flops per second
-    double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (h_MM_ms / 1000.f);
-    
-    // Print the results in a table
-    printf("Benchmark of h_MM\nResults:\n %4.4f GFLOPS \t%4.4fms\n",
-                    gigaFLOPS,
-                    h_MM_ms);
-    
-    VerifyCalculation(c, hh_c, 1e-5);
+    h_Benchmark(a, b, hh_c, wA, wB, hA);
 
+    VerifyCalculation(c, hh_c, wB*hA, 1e-5);
+    
     // release resources
     cudaFree(_a);
     cudaFree(_b);
