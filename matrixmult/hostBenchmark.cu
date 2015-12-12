@@ -10,7 +10,7 @@ double uSeconds()
     struct timeval Tp;
     int stat;
     stat = gettimeofday(&Tp, NULL);
-    if (stat != 0) printf("Error return from gettimeofday: %d",stat);
+    if (stat != 0) printf("Error return from gettimeofday: %d", stat);
     // Needs verification
     return(Tp.tv_sec + Tp.tv_usec*1.0e-6);
 }
@@ -35,8 +35,7 @@ void h_Benchmark(MatrixMult h_MM_p, float *a, float *b, float *hh_c, int wA, int
     double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (h_MM_ms / 1000.f);
     
     // Print the results in a table
-    printf("Benchmark of h_MM\n"
-            "Results:\n"
+    printf("Benchmark of h_MM results:\n"
             "%4.4f GFLOPS \t%4.4fms\n",
             gigaFLOPS,  h_MM_ms);
     

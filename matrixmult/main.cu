@@ -148,7 +148,8 @@ int main(int argc, char ** argv)
             gridRound(hC, BLOCKSIZE_Y));
     
     // Benchmark Matrix Multiplication Naive kernel
-    d_Benchmark_MM(k_MM,
+    d_Benchmark_MM(d_MM,
+            "d_MM",
             gridSize, blockSize,
             _a, _b, _c, wA, wB, hA);
                 
@@ -156,7 +157,8 @@ int main(int argc, char ** argv)
     cudaMemcpy(c_naive, _c, size_c, cudaMemcpyDeviceToHost);
     
     // Benchmark Matrix Multiplication Optimized kernel
-    d_Benchmark_MM(k_MM_OPT,
+    d_Benchmark_MM(d_MM_OPT,
+            "d_MM_OPT",
             gridSize, blockSize,
             _a, _b, _c, wA, wB, hA);
 

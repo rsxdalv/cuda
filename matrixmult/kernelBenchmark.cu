@@ -1,10 +1,9 @@
-enum KernelCode {
-    k_MM,
-    k_MM_OPT
-};
+// Kernel pointer typedef
+typedef void (*MatrixMult)(float *a, float *b, float *c, int wA, int wB, int hA);
 
-float d_Benchmark_MM(enum KernelCode kid,  // kernel specifier
-        //cudaError_t & error, cudaEvent_t & start, cudaEvent_t & stop,
+float d_Benchmark_MM(
+        MatrixMult kernel,
+        const char *name,
         dim3 gridSize, dim3 blockSize, // common launch parameters for all kernels
         float * _a, float * _b, float * _c, int wA, int wB, int hA) // kernel arguments
 {
@@ -36,21 +35,8 @@ float d_Benchmark_MM(enum KernelCode kid,  // kernel specifier
             exit(EXIT_FAILURE);
     }
 
-    // kernel call
-    switch(kid)
-    {
-        case k_MM:
-            fprintf(stderr, "Benchmark of d_MM \n");
-            d_MM<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
-            break;
-        case k_MM_OPT:
-            fprintf(stderr, "Benchmark of d_MM_OPT \n");
-            d_MM_OPT<<< gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
-            break;
-        default:
-            fprintf(stderr, "No Kernel Code!\n");
-            return 0.f;
-    }
+    // Kernel invocation
+    kernel<<<gridSize, blockSize >>>(_a, _b, _c, wA, wB, hA);
 
     // Record the stop event
     error = cudaEventRecord(stop, NULL);
@@ -88,8 +74,9 @@ float d_Benchmark_MM(enum KernelCode kid,  // kernel specifier
     double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (GEMM_ms / 1000.f);
     
     // Print the results in a table
-    printf("Results:\n"
+    fprintf(stderr, "Benchmark of %s results:\n"
             "%4.4f GFLOPS \t%4.4fms \t WorkgroupSize= %u threads/block\n",
+                                name,
             gigaFLOPS,      GEMM_ms,    blockSize.x * blockSize.y);
     
     return GEMM_ms;
