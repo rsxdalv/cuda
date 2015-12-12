@@ -1,4 +1,4 @@
-int VerifyCalculation(float *c, float *hh_c, int size, float threshold)
+int CompareResults(float *c, float *hh_c, int size, float threshold)
 {
     int errors = 0;
     for( int k = 0; k < size; k++)

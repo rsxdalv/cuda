@@ -74,7 +74,9 @@ int main(int argc, char ** argv)
                 break;
         }
         
-    printf("wA\thA\twB\ta\tb\n%d\t%d\t%d\t%1.2f\t%1.2f\n", wA, hA, wB, aValue, bValue);
+    printf( "wA\thA\twB\ta\tb\n"
+            "%d\t%d\t%d\t%1.2f\t%1.2f\n", 
+            wA, hA, wB, aValue, bValue);
     
     /**
      *  Neutral - both for host and device */
@@ -93,9 +95,10 @@ int main(int argc, char ** argv)
     float *a, *b, *c, *hh_c;
     a = (float *) malloc(size_a);
     b = (float *) malloc(size_b);
-    c = (float *) malloc(size_c);
-    /* Host testing memory */
     hh_c = (float *) malloc(size_c);
+    
+    /* Device output memory */
+    c = (float *) malloc(size_c);
     
     if( a == NULL || b == NULL || c == NULL || hh_c == NULL )
     {
@@ -112,8 +115,8 @@ int main(int argc, char ** argv)
     cudaMalloc( (void **) &_a, size_a );
     cudaMalloc( (void **) &_b, size_b );
     cudaMalloc( (void **) &_c, size_c );
-
-    /* Input initialization */
+    
+    /* Input memory initialization */
     for(int i = 0; i < hA * wA; i++)
         a[i] = aValue;
     
@@ -129,8 +132,8 @@ int main(int argc, char ** argv)
     cudaMemcpy(_b, b, size_b, cudaMemcpyHostToDevice);
 
     // x : columns , y: rows
-#define BLOCKSIZE_X 16
-#define BLOCKSIZE_Y 16
+    const int BLOCKSIZE_X = 16;
+    const int BLOCKSIZE_Y = 16;
     
     // Shorthand for int rounding
 #define gridRound(width, blocksize) (width + blocksize - 1)/blocksize
@@ -143,29 +146,33 @@ int main(int argc, char ** argv)
     
     // Benchmark Matrix Multiplication Naive kernel
     d_Benchmark_MM(k_MM,
-            //error, start, stop,
             gridSize, blockSize,
             _a, _b, _c, wA, wB, hA);
+                
+    // Obtain Device Kernel Results
+    cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
     
     // Benchmark Matrix Multiplication Optimized kernel
     d_Benchmark_MM(k_MM_OPT,
-            //error, start, stop,
             gridSize, blockSize,
             _a, _b, _c, wA, wB, hA);
 
-    // copy data back to CPU
+    // Obtain Device Kernel Results
     cudaMemcpy(c, _c, size_c, cudaMemcpyDeviceToHost);
     
     //////////////////////////////////////////////////
+    // Benchmark host kernel
     h_Benchmark(a, b, hh_c, wA, wB, hA);
 
-    VerifyCalculation(c, hh_c, wB*hA, 1e-5);
+    // Compare device and host kernel outputs to 1e-5 threshold
+    CompareResults(c, hh_c, wB*hA, 1e-5);
     
-    // release resources
+    // Release device memory
     cudaFree(_a);
     cudaFree(_b);
     cudaFree(_c);
 
+    // Release host memory
     free(a);
     free(b);
     free(c);

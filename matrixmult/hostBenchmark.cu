@@ -32,8 +32,9 @@ void h_Benchmark(float *a, float *b, float *hh_c, int wA, int wB, int hA)
     double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (h_MM_ms / 1000.f);
     
     // Print the results in a table
-    printf("Benchmark of h_MM\nResults:\n %4.4f GFLOPS \t%4.4fms\n",
-                    gigaFLOPS,
-                    h_MM_ms);
+    printf("Benchmark of h_MM\n"
+            "Results:\n"
+            "%4.4f GFLOPS \t%4.4fms\n",
+            gigaFLOPS,  h_MM_ms);
     
 }

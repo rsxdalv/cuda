@@ -88,10 +88,9 @@ float d_Benchmark_MM(enum KernelCode kid,  // kernel specifier
     double gigaFLOPS = (FLOP_GEMM * 1.0e-9f) / (GEMM_ms / 1000.f);
     
     // Print the results in a table
-    printf("Results:\n %4.4f GFLOPS \t%4.4fms \t WorkgroupSize= %u threads/block\n",
-                    gigaFLOPS,
-                    GEMM_ms,
-                    blockSize.x * blockSize.y);
+    printf("Results:\n"
+            "%4.4f GFLOPS \t%4.4fms \t WorkgroupSize= %u threads/block\n",
+            gigaFLOPS,      GEMM_ms,    blockSize.x * blockSize.y);
     
     return GEMM_ms;
 }
