@@ -11,7 +11,7 @@
 // Some standard libraries are included as per CMake configuration.
 //      TODO: Add the list of them /usr/local/cuda/lib64
 
-// fprintf() - for errors and results
+// fprintf() - for displaying errors and results
 #include <stdio.h>
 // getopt() - Command line argument parsing
 #include <unistd.h>
@@ -47,6 +47,7 @@ int main(int argc, char ** argv)
     
     // Disable getopt() error handling
     opterr = 0;
+    // Store variable for getopt
     int getopt_state = 0;
     while ((getopt_state = getopt (argc, argv, "a:h:b:x:y:")) != -1) 
         switch (getopt_state) {
@@ -164,7 +165,7 @@ int main(int argc, char ** argv)
     
     //////////////////////////////////////////////////
     // Benchmark host kernel
-    h_Benchmark(a, b, hh_c, wA, wB, hA);
+    h_Benchmark(h_MM, a, b, hh_c, wA, wB, hA);
 
     // Compare device and host kernel outputs to 1e-5 threshold
     CompareResults(c, hh_c, wB*hA, 1e-5);

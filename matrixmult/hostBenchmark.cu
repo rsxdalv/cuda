@@ -1,6 +1,9 @@
 // gettimeofday()
 #include <sys/time.h>
 
+// Kernel pointer typedef
+typedef void (*MatrixMult)(float *a, float *b, float *c, int wA, int wB, int hA);
+
 // Returns current number of microseconds
 double uSeconds()
 {
@@ -14,11 +17,11 @@ double uSeconds()
 
 // HOST Benchmark \w Timing based on sys/time microseconds
 // Record starting time
-void h_Benchmark(float *a, float *b, float *hh_c, int wA, int wB, int hA)
+void h_Benchmark(MatrixMult h_MM_p, float *a, float *b, float *hh_c, int wA, int wB, int hA)
 {
     double h_start = uSeconds();
     // Execute kernel
-    h_MM(a, b, hh_c, wA, wB, hA);
+    h_MM_p(a, b, hh_c, wA, wB, hA);
     // Record ending time
     double h_end = uSeconds();
     double h_MM_ms = (h_end - h_start) * 1000;

@@ -2,7 +2,6 @@
 <configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
-      <in>MatrixMult.cu</in>
       <in>hostBenchmark.cu</in>
       <in>hostKernels.cu</in>
       <in>kernelBenchmark.cu</in>
@@ -30,9 +29,6 @@
         <dependencyChecking>false</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
-      <flagsDictionary>
-        <element flagsID="0" commonFlags="-xc++ -O2 -m64"/>
-      </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
       <makefileType>
@@ -61,10 +57,6 @@
           </ccTool>
         </makeTool>
       </makefileType>
-      <item path="MatrixMult.cu" ex="false" tool="1" flavor2="0">
-        <ccTool flags="0">
-        </ccTool>
-      </item>
       <item path="hostBenchmark.cu" ex="false" tool="0" flavor2="0">
       </item>
       <item path="hostKernels.cu" ex="false" tool="0" flavor2="0">
@@ -111,19 +103,6 @@
           </ccTool>
         </makeTool>
       </makefileType>
-      <item path="MatrixMult.cu" ex="false" tool="1" flavor2="9">
-        <ccTool flags="0">
-          <incDir>
-            <pElem>../../../../.cache/netbeans/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/include</pElem>
-            <pElem>../../../../.cache/netbeans/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/samples/common/inc</pElem>
-            <pElem>CMakeFiles/MatrixMult.dir</pElem>
-            <pElem></pElem>
-          </incDir>
-          <incFile>
-            <pElem>../../../../.cache/netbeans/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/include/cuda_runtime.h</pElem>
-          </incFile>
-        </ccTool>
-      </item>
       <item path="hostBenchmark.cu" ex="false" tool="0" flavor2="0">
       </item>
       <item path="hostKernels.cu" ex="false" tool="0" flavor2="2">
