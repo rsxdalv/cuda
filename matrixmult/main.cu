@@ -48,30 +48,15 @@ int main(int argc, char ** argv)
     // Disable getopt() error handling
     opterr = 0;
     int getopt_state = 0;
-    while ((getopt_state = getopt (argc, argv, "a:h:b:x:y:")) != -1)
-        switch (getopt_state)
-        {
-            case 'a':
-                wA = atoi(optarg);
-                break;
-            case 'h':
-                hA = atoi(optarg);
-                break;
-            case 'b':
-                wB = atoi(optarg);
-                break;
-            case 'x':
-                aValue = atoi(optarg);
-                break;
-            case 'y':
-                bValue = atoi(optarg);
-                break;
-            case '?':
-                fprintf(stderr, "Invalid Option or Missing argument for: -%c\n", optopt);
-                break;
-            default:
-                fprintf(stderr, "GetOpt failure or uncaught option!\n");
-                break;
+    while ((getopt_state = getopt (argc, argv, "a:h:b:x:y:")) != -1) 
+        switch (getopt_state) {
+            case 'a': wA = atoi(optarg); break;
+            case 'h': hA = atoi(optarg); break;
+            case 'b': wB = atoi(optarg); break;
+            case 'x': aValue = atoi(optarg); break;
+            case 'y': bValue = atoi(optarg); break;
+            case '?': fprintf(stderr, "Invalid Option or Missing argument: -%c\n", optopt); break;
+            default: fprintf(stderr, "GetOpt failure or uncaught option!\n"); break;
         }
         
     printf( "Experiment setup:\n"
