@@ -6,29 +6,27 @@
  *      Goal: Benchmark highly optimized matrix multiplication with parallelization
  * 
  * TODO: 
- *      Description including all the framework (Launch pad, Testing suite, Glue, Theory)
- *      Add function-lists to includes
  *      Create register pressure aware kernels
- *      Improve test suite code and output
  */
-// Some standard libraries are included as per CMake configuration
+// Some standard libraries are included as per CMake configuration.
+// TODO: Add the list of them /usr/local/cuda/lib64
 
 // printf() - Text output via fprintf()
 #include <stdio.h>
 // getopt() - Command line argument parsing
 #include <unistd.h>
 
-// d_MM, d_MM_OPT
+// d_MM(), d_MM_OPT()
 #include "kernels.cu"
-// h_MM
+// h_MM()
 #include "hostKernels.cu"
 
-// d_Benchmark
+// d_Benchmark()
 #include "kernelBenchmark.cu"
-// h_Benchmark
+// h_Benchmark()
 #include "hostBenchmark.cu"
 
-// VerifyCalculation(*c, *hh_c, threshold)
+// VerifyCalculation()
 #include "verificator.cu"
 
 /**
