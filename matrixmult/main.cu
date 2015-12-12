@@ -13,26 +13,23 @@
  */
 // Some standard libraries are included as per CMake configuration
 
-// printf() - Text output
+// printf() - Text output via fprintf()
 #include <stdio.h>
-
 // getopt() - Command line argument parsing
 #include <unistd.h>
 
 // d_MM, d_MM_OPT
 #include "kernels.cu"
-
 // h_MM
 #include "hostKernels.cu"
 
 // d_Benchmark
 #include "kernelBenchmark.cu"
+// h_Benchmark
+#include "hostBenchmark.cu"
 
 // VerifyCalculation(*c, *hh_c, threshold)
 #include "verificator.cu"
-
-// h_Benchmark
-#include "hostBenchmark.cu"
 
 /**
  * Tests matrix multiplication on 2 kernels and 1 host algorithm, by setting up
@@ -41,17 +38,16 @@
  */
 int main(int argc, char ** argv)
 {
-    // width A - a
-    int wA = 512;
-    // height A - h
-    int hA = 512;
-    // width B - b
-    int wB = 512;
-    // value A - x
-    float aValue = 1.0;
-    // value B - y
-    float bValue = 2.0;
+    // width 'a', height 'h', width 'b'
+    int     wA = 512,
+            hA = 512,
+            wB = 512;
     
+    // value 'x', value 'y'
+    float   aValue = 1.0,
+            bValue = 2.0;
+    
+    // Disable getopt() error handling
     opterr = 0;
     int getopt_state = 0;
     while ((getopt_state = getopt (argc, argv, "a:h:b:x:y:")) != -1)
@@ -81,6 +77,7 @@ int main(int argc, char ** argv)
         }
         
     printf("wA\thA\twB\ta\tb\n%d\t%d\t%d\t%1.2f\t%1.2f\n", wA, hA, wB, aValue, bValue);
+    
     /**
      *  Neutral - both for host and device */
     
