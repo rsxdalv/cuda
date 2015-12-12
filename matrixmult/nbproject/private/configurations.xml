@@ -8,7 +8,6 @@
       <in>kernelBenchmark.cu</in>
       <in>kernels.cu</in>
       <in>main.cu</in>
-      <in>utils.cu</in>
       <in>verificator.cu</in>
     </df>
   </logicalFolder>

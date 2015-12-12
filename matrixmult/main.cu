@@ -19,9 +19,6 @@
 // getopt() - Command line argument parsing
 #include <unistd.h>
 
-// double microseconds();
-#include "utils.cu"
-
 // d_MM, d_MM_OPT
 #include "kernels.cu"
 

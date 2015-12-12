@@ -8,7 +8,6 @@
       <in>kernelBenchmark.cu</in>
       <in>kernels.cu</in>
       <in>main.cu</in>
-      <in>utils.cu</in>
       <in>verificator.cu</in>
     </df>
     <logicalFolder name="ExternalFiles"
@@ -75,8 +74,6 @@
       <item path="kernels.cu" ex="false" tool="0" flavor2="0">
       </item>
       <item path="main.cu" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="utils.cu" ex="false" tool="0" flavor2="0">
       </item>
       <item path="verificator.cu" ex="false" tool="1" flavor2="0">
       </item>
@@ -146,8 +143,6 @@
             <pElem>../../../../AppData/Local/NetBeans/Cache/8.0.2/remote-files/kepler1.ece.neu.edu_22_roberts/usr/local/cuda/include/cuda_runtime.h</pElem>
           </incFile>
         </ccTool>
-      </item>
-      <item path="utils.cu" ex="false" tool="0" flavor2="2">
       </item>
       <item path="verificator.cu" ex="false" tool="1" flavor2="0">
       </item>
