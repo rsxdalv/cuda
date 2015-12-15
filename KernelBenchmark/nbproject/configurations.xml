@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="f1"
+                   displayName="Device Kernels"
+                   projectFiles="true"
+                   kind="ROOT">
+      <itemPath>d_HG.cu</itemPath>
+      <itemPath>d_MM.cu</itemPath>
+      <itemPath>d_VA.cu</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f2"
+                   displayName="Host Kernels"
+                   projectFiles="true"
+                   kind="ROOT">
+      <itemPath>h_MM.cu</itemPath>
+    </logicalFolder>
     <df root="." name="0">
-      <in>d_HG.cu</in>
-      <in>d_MM.cu</in>
-      <in>d_VA.cu</in>
-      <in>h_MM.cu</in>
-      <in>hostBenchmark.cu</in>
-      <in>kernelBenchmark.cu</in>
-      <in>main.cu</in>
-      <in>verificator.cu</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -18,6 +24,10 @@
       <itemPath>CMakeLists.txt</itemPath>
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>hostBenchmark.cu</itemPath>
+    <itemPath>kernelBenchmark.cu</itemPath>
+    <itemPath>main.cu</itemPath>
+    <itemPath>verificator.cu</itemPath>
   </logicalFolder>
   <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
   <sourceRootList>
