@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <logicalFolder name="f1"
-                   displayName="Device Kernels"
-                   projectFiles="true"
-                   kind="ROOT">
+    <logicalFolder name="f1" displayName="Device Kernels" projectFiles="true">
       <itemPath>d_HG.cu</itemPath>
       <itemPath>d_MM.cu</itemPath>
       <itemPath>d_VA.cu</itemPath>
     </logicalFolder>
-    <logicalFolder name="f2"
-                   displayName="Host Kernels"
-                   projectFiles="true"
-                   kind="ROOT">
+    <logicalFolder name="f2" displayName="Host Kernels" projectFiles="true">
+      <itemPath>h_HG.cu</itemPath>
       <itemPath>h_MM.cu</itemPath>
     </logicalFolder>
     <df root="." name="0">
@@ -75,6 +70,8 @@
       </item>
       <item path="d_VA.cu" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="h_HG.cu" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="h_MM.cu" ex="false" tool="0" flavor2="0">
       </item>
       <item path="hostBenchmark.cu" ex="false" tool="0" flavor2="0">
@@ -124,6 +121,8 @@
       <item path="d_MM.cu" ex="false" tool="0" flavor2="2">
       </item>
       <item path="d_VA.cu" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="h_HG.cu" ex="false" tool="1" flavor2="0">
       </item>
       <item path="h_MM.cu" ex="false" tool="0" flavor2="2">
       </item>
