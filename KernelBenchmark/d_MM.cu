@@ -31,7 +31,6 @@ __global__ void d_MM(float *a, float *b, float *c, int wA, int wB, int hA)
 /**
  * KERNEL d_MM_OPT() - Takes two 2D matrices and multiplies them optimally
  * Output set is divided into blocks of powers of two. 
- * RENAME: d_MM_OPT
  * @param a - 1st Matrix
  * @param b - 2nd Matrix
  * @param c - Result Matrix
