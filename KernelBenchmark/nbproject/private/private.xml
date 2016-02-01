@@ -9,6 +9,10 @@
     </data>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/KernelBenchmark/d_MM.cu</file>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/KernelBenchmark/d_HG.cu</file>
+            <file>file:/C:/Users/Roberts/Documents/Programming/cuda-repo/KernelBenchmark/h_HG.cu</file>
+        </group>
     </open-files>
 </project-private>
