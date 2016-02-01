@@ -1,0 +1,15 @@
+GPU Histogram
+Exemplifies bank error resolution within warps.
+Aim: for a given architecture, calculate a histogram without encountering bank serialization.
+Input: intensity data, that’s being mapped onto a scale of 0-255.
+Output: 0-255 bins with frequency data.
+Problem 1: For X threads in a warp, a shared memory histogram vector promotes bank serialization for similar intensities that map to the same bin. 
+Solution 1: For X threads, no bank conflicts would occur if each thread had its sub histogram vector spaced on an individual bank for each thread. 
+Problem 2: Solution 1 creates huge memory consumption.
+Solution 2: The minimum that can be used is an 8-bit word (though I’m not sure if it doesn’t fall too close in terms of banks, i.e., if banks aren’t 32 bits wide, making all the saving process useless, besides of course the possibility to reuse these vectors 4 times with a shift each time, which creates its own problem. For now the solution is to stick to a <bank-width-word> which is 32 bits, presumably.
+Problem 3: Sub histograms need to be merged.
+Solution 3: Each of the bins can be swept up in a single thread and summed up accordingly. The efficient process may result in more sub histograms, but be reduced by 32 times each iteration, for example. This process can take advantage of registers, but once again threatens to access the banks. 
+Problem 4: What number of points should each thread resolve?
+Solution 4: Each thread should solve as many points as it can as long as it does not prevent other potential threads from splitting its workload. This implies that another block of threads can only be launched until all of the memory is used up, making it device specific optimization. Also, this involves the hidden efficiency of registers being the most important resource, further shifting the balance towards fewer threads. Once again, based on register file, dependent of device.
+Problem 5: Solution 3’s naïve memory access promotes <number of threads> bank conflicts when merging sub-histograms.
+Solution 5: Using modulo arithmetic, pad each following thread’s access by 1 bank. Thus, each thread accesses it’s own bank before they all switch. My belief is that this is commonly solved by a [X+1] array which automatically shifts the addresses. 
