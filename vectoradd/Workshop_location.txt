@@ -1,1 +1,0 @@
-/home/workshop/.netbeans/remote/129.10.53.105/roberts-vpceb46fx-Linux-x86_64/home/roberts/CUDA/nucar-tegra-cuda/vectoradd
